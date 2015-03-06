@@ -41,7 +41,7 @@
 // duty cycle percentage multiplied by 255
 //   Current setting is 50, setting max output to 
 //   a 20% duty cycle
-#define PWM_MAX_VALUE         50 
+#define PWM_MAX_VALUE         100 
 
 typedef struct _Waveform_Generator_State {
     volatile uint8_t* channel_1_output;
