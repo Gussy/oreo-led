@@ -50,7 +50,9 @@ typedef enum _Light_Param_Macro {
     PARAM_MACRO_BLUE,           // 8
     PARAM_MACRO_AMBER,          // 9
     PARAM_MACRO_WHITE,          // 10
-    PARAM_MACRO_ENUM_COUNT      // 11
+    PARAM_MACRO_AUTOMOBILE_COLORS,  // 11
+    PARAM_MACRO_AVIATION_COLORS,    // 12
+    PARAM_MACRO_ENUM_COUNT      // 13
 } LightParamMacro;
 
 static const short int LightParameterSize[PARAM_ENUM_COUNT] = {
