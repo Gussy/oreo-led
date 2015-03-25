@@ -195,7 +195,7 @@ ISR(WDT_vect) {
 
                 // startup has failed, show all Aviation colors 
                 //   and continue to check for communications
-                LPP_setParamMacro(PARAM_MACRO_AVIATION_COLORS);
+                LPP_setParamMacro(PARAM_MACRO_AUTOMOBILE_COLORS);
             }
 
             // reset wdt flag
