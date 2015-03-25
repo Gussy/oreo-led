@@ -187,6 +187,8 @@ of the light. Notes in each possible pattern selection follows:
 * `PARAM_MACRO_BLUE`
 * `PARAM_MACRO_AMBER`
 * `PARAM_MACRO_WHITE`
+* `PARAM_MACRO_AUTOMOBILE_COLORS`
+* `PARAM_MACRO_AVIATION_COLORS`
 
 
 ### Examples
