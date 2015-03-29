@@ -24,6 +24,9 @@
 //   in the synchro clock header
 #define MAX_PATTERN_PERIOD 4000.0
 
+// Nonce used to verify reset command is valid
+#define RESET_NONCE 0x2A
+
 typedef enum _Light_Protocol_Parameter {
     PARAM_BIAS_RED,             // 0
     PARAM_BIAS_GREEN,           // 1
@@ -35,7 +38,8 @@ typedef enum _Light_Protocol_Parameter {
     PARAM_REPEAT,               // 7
     PARAM_PHASEOFFSET,          // 8
     PARAM_MACRO,                // 9
-    PARAM_ENUM_COUNT            // 10
+    PARAM_RESET,                // 10
+    PARAM_ENUM_COUNT            // 11
 } LightProtocolParameter;
 
 typedef enum _Light_Param_Macro {
@@ -63,7 +67,8 @@ static const short int LightParameterSize[PARAM_ENUM_COUNT] = {
     2,  // Period
     1,  // Repeat
     2,  // Phase Offset
-    1   // Param Macro
+    1,  // Param Macro
+    1,  // Param Reset
 };
 
 typedef struct _Light_Pattern_Protocol {

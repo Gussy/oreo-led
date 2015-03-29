@@ -12,6 +12,7 @@
 **********************************************************************/
 
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include "light_pattern_protocol.h"
 #include "pattern_generator.h"
 #include "utilities.h"
@@ -192,6 +193,13 @@ void _LPP_processParameterUpdate(LightProtocolParameter param, int start, char* 
         case PARAM_MACRO:
             if (buffer[start] < PARAM_MACRO_ENUM_COUNT)
                 LPP_setParamMacro(buffer[start]);
+            break;
+
+        case PARAM_RESET:
+            if(buffer[start] == RESET_NONCE)
+                // Soft-reset by enabling the watchdog and going into a tight loop
+                wdt_enable(WDTO_15MS);
+                for(;;) {};
             break;
 
         default:
