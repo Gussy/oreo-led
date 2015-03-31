@@ -15,6 +15,7 @@
 #include <avr/interrupt.h>
 #include <avr/cpufunc.h>
 #include <util/delay.h>
+#include <string.h>
 
 #include "twi_manager.h"
 #include "node_manager.h"
