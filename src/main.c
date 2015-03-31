@@ -66,8 +66,11 @@ int main(void) {
     // init synchro node singleton
     SYNCLK_init();
 
+    uint8_t oldSREG = SREG;
+    cli();
     // delay to acquire hardware pin settings
     // and node initialization
+    
     NODE_init();
 
     // init TWI node singleton with device ID
