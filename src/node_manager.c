@@ -47,9 +47,13 @@ uint8_t NODE_getId() {
 		
 		_delay_ms(200);
 
-        // capture unit station
-        _NODE_station = (PIND & 0b11000000) >> 6;
+        uint8_t oldSREG = SREG;
+        cli();
+        // wait for pullup to settle
+        _delay_ms(15);
 
+        _NODE_station = (PIND & 0b11000000) >> 6;
+        SREG = oldSREG;
     }
 
     return _NODE_station;
