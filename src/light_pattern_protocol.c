@@ -55,9 +55,26 @@ uint8_t LPP_processBuffer(char* twiCommandBuffer, int size) {
         size > 0 &&
         _self_pattern_protocol.isCommandFresh) {
         
-        uint8_t reply[2] = { NODE_getId(), twiCommandBuffer[0] };
+		 // Pop XOR from buffer
+		//uint8_t masterXOR = twiCommandBuffer[--size];
+		
+		// Calculate XOR CRC
+		uint8_t i;
+		uint8_t slaveXOR = 0x00;
+		for(i = 0; i < size; i++) {
+			slaveXOR ^= twiCommandBuffer[i];
+		}
+		
+		// Send a reply containing the node address and the calculated XOR
+        uint8_t reply[2] = { (0x68 + NODE_getId()), slaveXOR };
         debug_pulse(7);
         TWI_SetReply(reply, 2);
+
+		// Return false if a different calculated XOR than the master sent was received
+		/*if(masterXOR != slaveXOR) {
+			_self_pattern_protocol.isCommandFresh = 0;
+			return 0;
+		}*/
 
         // signal startup 
         processed_retval = 1;
@@ -102,7 +119,6 @@ uint8_t LPP_processBuffer(char* twiCommandBuffer, int size) {
 
             // advance pointer
             buffer_pointer += paramSize + 1;
-
         }
 
     }
