@@ -76,10 +76,6 @@ int main(void) {
     // init TWI node singleton with device ID
     TWI_init(NODE_getId());
 
-    // register TWI event callbacks
-    TWI_onGeneralCall(SYNCLK_recordPhaseError);
-    TWI_onDataReceived(LPP_setCommandRefreshed);
-
     // init the generators
     PG_init(&pgRed);
     PG_init(&pgGreen);

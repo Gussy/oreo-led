@@ -19,6 +19,8 @@
 
 #include "twi_manager.h"
 #include "node_manager.h"
+#include "synchro_clock.h"
+#include "light_pattern_protocol.h"
 
 // TWI buffer
 static uint8_t TWI_Ptr;
@@ -32,10 +34,6 @@ static uint8_t TWI_ReplyBuf[8];
 // TWI application status flags
 static uint8_t TWI_isBufferAvailable; 
 static uint8_t TWI_isSlaveAddressed;
-
-// callbacks
-static void (*generalCallCB)();
-static void (*dataReceivedCB)();
 
 void debug_pulse(uint8_t count)
 {
@@ -70,23 +68,6 @@ void TWI_init(uint8_t deviceId) {
 
     // release clock lines on startup
     TWCR |= TWCR_TWINT;
-
-}
-
-// specify callback to be executed
-//  when device receives a general call
-void TWI_onGeneralCall(void (*cb)()) {
-
-    generalCallCB = cb;
-
-}
-
-// specify callback to be executed
-//  when device receives a completed 
-//  data packet (at STOP signal)
-void TWI_onDataReceived(void (*cb)()) {
-
-    dataReceivedCB = cb;
 
 }
 
@@ -146,7 +127,7 @@ ISR(TWI_vect) {
         case TWI_SRX_GEN_ACK:
 
             // execute callback when general call received
-            if (generalCallCB) generalCallCB();
+            SYNCLK_recordPhaseError();
             TWI_isSlaveAddressed = 0;
 
             // reset TWCR
@@ -169,8 +150,8 @@ ISR(TWI_vect) {
 
             // execute callback when data received
             // and addressed as slave (do not process gen call data)
-            if (TWI_isSlaveAddressed && dataReceivedCB) 
-                dataReceivedCB();
+            if (TWI_isSlaveAddressed) 
+                LPP_setCommandRefreshed();
 
             // reset TWCR
             TWCR = TWCR_RESET;
