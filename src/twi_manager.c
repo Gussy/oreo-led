@@ -93,10 +93,8 @@ char* TWI_getBuffer(void) {
 }
 
 // returns buffer pointer
-int TWI_getBufferSize(void) {
-
+uint8_t TWI_getBufferSize(void) {
     return TWI_Ptr;
-
 }
 
 // reset bit pattern for TWI control register
