@@ -44,8 +44,10 @@ uint8_t NODE_getId() {
 
         // turn off pullup resistor
         PORTD = 0x00;
+		
+		_delay_ms(200);
 
-        // capture unit station 
+        // capture unit station
         _NODE_station = (PIND & 0b11000000) >> 6;
 
     }

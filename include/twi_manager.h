@@ -21,7 +21,6 @@
 // TWI buffer
 int TWI_Ptr;
 #define TWI_MAX_BUFFER_SIZE 100
-char TWI_Buffer[TWI_MAX_BUFFER_SIZE];
 
 // TWI hardware flags
 #define TWCR_TWINT          0b10000000 // TWI Interrupt Flag

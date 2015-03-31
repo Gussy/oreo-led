@@ -68,7 +68,6 @@ int main(void) {
 
     // delay to acquire hardware pin settings
     // and node initialization
-    _delay_ms(200);
     NODE_init();
 
     // init TWI node singleton with device ID
@@ -99,9 +98,10 @@ int main(void) {
     //  updates in a coordinated way
     WG_onOverflow(SYNCLK_updateClock);
 
+/*
     // if previous shutdown was a WDT reset...
     if (mcusr_mirror & 0x08) {
-
+				
         // resume pattern
         if (NODE_isRestoreStateAvailable()) 
             NODE_restoreRGBState(&pgRed, &pgGreen, &pgBlue);
@@ -113,7 +113,7 @@ int main(void) {
         NODE_system_status = NODE_STARTUP_SUCCESS;
 
     } else {
-
+*/
         // configure startup health check timer
         //   to enter 'failed' more (all red LEDs)
         //   if device has not received any i2c comms
@@ -125,14 +125,16 @@ int main(void) {
         //   by the node manager
         NODE_setRestoreStateUnavailable();
 
+ /*
     }
+ */
 
     // reset wdt timer
     NODE_wdt_reset();
 
     // enable interrupts 
     sei();
-
+	
     // application mainloop 
     while(1) {
 
@@ -195,7 +197,7 @@ ISR(WDT_vect) {
 
                 // startup has failed, show all red LEDs
                 //   and stop processing further communication
-                LPP_setParamMacro(PARAM_MACRO_RED);
+                LPP_setParamMacro(PARAM_MACRO_RESET);
                 NODE_system_status = NODE_STARTUP_FAIL;
 
             }

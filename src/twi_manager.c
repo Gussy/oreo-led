@@ -13,11 +13,13 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/sleep.h>
 #include <avr/cpufunc.h>
+#include <util/delay.h>
 
 #include "twi_manager.h"
 #include "node_manager.h"
+
+static char TWI_Buffer[TWI_MAX_BUFFER_SIZE];
 
 void TWI_init(uint8_t deviceId) {
 
@@ -26,7 +28,7 @@ void TWI_init(uint8_t deviceId) {
     //  if PB4 is ever asserted high, an error has
     //  been detected
     DDRB |= 0b00010000; 
-    PORTB &= 0b11101111; 
+    PORTB &= 0b11101111;
 
     // calculate slave address
     // 8-bit address is 0xD0, 0xD2, 
