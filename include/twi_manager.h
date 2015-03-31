@@ -77,5 +77,6 @@ void TWI_onDataReceived(void (*)());
 char* TWI_getBuffer(void);
 uint8_t TWI_getBufferSize(void);
 void TWI_init(uint8_t);
+void TWI_SetReply(uint8_t *buf, uint8_t len);
 
 #endif

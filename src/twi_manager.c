@@ -24,6 +24,10 @@ static uint8_t TWI_Ptr;
 #define TWI_MAX_BUFFER_SIZE 100
 static char TWI_Buffer[TWI_MAX_BUFFER_SIZE];
 
+static uint8_t TWI_SendPtr;
+static uint8_t TWI_ReplyLen;
+static uint8_t TWI_ReplyBuf[8];
+
 // TWI application status flags
 static uint8_t TWI_isBufferAvailable; 
 static uint8_t TWI_isSlaveAddressed;
@@ -113,7 +117,14 @@ ISR(TWI_vect) {
         // Data byte in TWDR has been transmitted; ACK has been received
         case TWI_STX_DATA_ACK:           
             // set per atmel app note example for SLAR mode
-            TWCR = TWCR_RESET;
+            if (TWI_SendPtr >= TWI_ReplyLen) {
+                TWDR = 0xFF;
+                debug_pulse(4);
+            } else {
+                TWDR = TWI_ReplyBuf[TWI_SendPtr++];
+                debug_pulse(TWI_SendPtr);
+            }
+            TWCR |= (1<<TWINT) | (1<<TWEA);
             break;
 
         // bus failure
@@ -171,6 +182,7 @@ ISR(TWI_vect) {
 
             // reset pointer
             TWI_Ptr = 0;
+            TWI_SendPtr = 0;
             TWI_isBufferAvailable = 1;
             TWI_isSlaveAddressed = 1;
 
@@ -217,11 +229,21 @@ ISR(TWI_vect) {
 
             // default case 
             //  assert PB4 for debug
-            PORTB |= 0b00010000; 
-
+            //PORTB |= 0b00010000; 
+            
     }
 
     // always release clock line
     TWCR |= TWCR_TWINT;
 
+}
+
+void TWI_SetReply(uint8_t *buf, uint8_t len)
+{
+    TWI_ReplyLen = 0;
+    if (len > sizeof(TWI_ReplyBuf)) {
+        len = sizeof(TWI_ReplyBuf);
+    }
+    memcpy(TWI_ReplyBuf, buf, len);
+    TWI_ReplyLen = len;
 }

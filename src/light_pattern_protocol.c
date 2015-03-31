@@ -17,6 +17,7 @@
 #include "pattern_generator.h"
 #include "utilities.h"
 #include "node_manager.h"
+#include "twi_manager.h"
 
 // private module singleton instance
 static LightPatternProtocol _self_pattern_protocol;
@@ -45,12 +46,18 @@ uint8_t LPP_processBuffer(char* twiCommandBuffer, int size) {
     // return true if command was processed
     uint8_t processed_retval = 0;
 
+    debug_pulse(size);
+        
     // if command is new, re-parse
     // ensure valid length buffer
     // ensure pointer is valid
     if (twiCommandBuffer && 
         size > 0 &&
         _self_pattern_protocol.isCommandFresh) {
+        
+        uint8_t reply[2] = { NODE_getId(), twiCommandBuffer[0] };
+        debug_pulse(7);
+        TWI_SetReply(reply, 2);
 
         // signal startup 
         processed_retval = 1;
