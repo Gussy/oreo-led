@@ -59,6 +59,7 @@ uint8_t NODE_getId() {
 void NODE_wdt_setOneSecInterruptMode() {
 
     // disable interrupts
+    uint8_t oldSREG = SREG;
     cli();
 
     // setup wdtcsr register for update of WDE bit
@@ -69,14 +70,15 @@ void NODE_wdt_setOneSecInterruptMode() {
     WDTCSR = (1<<WDIF) | (1<<WDIE) | (1<<WDCE) | (0<<WDE) | 
         (0<<WDP3) | ( 1<<WDP2) | (1<<WDP1) | (0<<WDP0);
 
-    // enable interrupts
-    sei();
+    // restore interrupts
+    SREG = oldSREG;
 
 }
 
 void NODE_wdt_setHalfSecResetMode() {
 
     // disable interrupts
+    uint8_t oldSREG = SREG;
     cli();
 
     // setup wdtcsr register for update of WDE bit
@@ -88,19 +90,20 @@ void NODE_wdt_setHalfSecResetMode() {
         (0<<WDP3) | ( 1<<WDP2) | (0<<WDP1) | (1<<WDP0);
 
     // enable interrupts
-    sei();
+    SREG = oldSREG;
     
 }
 
 uint8_t NODE_isRestoreStateAvailable() {
 
     // disable interrupts
+    uint8_t oldSREG = SREG;
     cli();
 
     uint8_t value = eeprom_read_byte(RESTORE_POINT_AVAILABLE_ADDR);
 
     // enable interrupts
-    sei();
+    SREG = oldSREG;
 
     return value;
 
@@ -109,18 +112,20 @@ uint8_t NODE_isRestoreStateAvailable() {
 void NODE_setRestoreStateUnavailable() {
 
     // disable interrupts
+    uint8_t oldSREG = SREG;
     cli();
 
     eeprom_write_byte(RESTORE_POINT_AVAILABLE_ADDR, 0);
 
     // enable interrupts
-    sei();
+    SREG = oldSREG;
 
 }
 
 void NODE_saveRGBState(PatternGenerator* r, PatternGenerator* g, PatternGenerator* b) {
 
     // disable interrupts
+    uint8_t oldSREG = SREG;
     cli();
 
     // save rgb state values
@@ -132,14 +137,14 @@ void NODE_saveRGBState(PatternGenerator* r, PatternGenerator* g, PatternGenerato
     eeprom_write_byte(RESTORE_POINT_AVAILABLE_ADDR, 1);
 
     // enable interrupts
-    sei();
+    SREG = oldSREG;
 
 }
 
 void NODE_restoreRGBState(PatternGenerator* r, PatternGenerator* g, PatternGenerator* b) {
 
     // disable interrupts
-    cli();
+    uint8_t oldSREG = SREG;
 
     // restore values as a solid pattern
     r->bias = eeprom_read_byte(RESTORE_POINT_RED_VALUE);
@@ -152,7 +157,6 @@ void NODE_restoreRGBState(PatternGenerator* r, PatternGenerator* g, PatternGener
     b->pattern = PATTERN_SOLID;
 
     // enable interrupts
-    sei();
-    
+    SREG = oldSREG;    
 }
 
