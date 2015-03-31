@@ -19,6 +19,9 @@
 #include "twi_manager.h"
 #include "node_manager.h"
 
+// TWI buffer
+static uint8_t TWI_Ptr;
+#define TWI_MAX_BUFFER_SIZE 100
 static char TWI_Buffer[TWI_MAX_BUFFER_SIZE];
 
 void TWI_init(uint8_t deviceId) {

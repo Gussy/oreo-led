@@ -18,10 +18,6 @@
 
 #include "utilities.h"
 
-// TWI buffer
-int TWI_Ptr;
-#define TWI_MAX_BUFFER_SIZE 100
-
 // TWI hardware flags
 #define TWCR_TWINT          0b10000000 // TWI Interrupt Flag
 #define TWCR_TWEA           0b01000000 // TWI Enable Acknowledge Bit
