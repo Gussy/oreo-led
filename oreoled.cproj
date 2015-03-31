@@ -158,6 +158,9 @@
     <Compile Include="src\main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\node_manager.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\pattern_generator.c">
       <SubType>compile</SubType>
     </Compile>
