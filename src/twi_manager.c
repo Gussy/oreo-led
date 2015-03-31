@@ -32,6 +32,19 @@ static uint8_t TWI_isSlaveAddressed;
 static void (*generalCallCB)();
 static void (*dataReceivedCB)();
 
+void debug_pulse(uint8_t count)
+{
+    uint8_t oldSREG = SREG;
+    cli();
+    while (count--) {
+        PORTB |= 0b00010000;         
+        _delay_us(1);
+        PORTB &= ~0b00010000;         
+        _delay_us(1);
+    }
+    SREG = oldSREG;
+}
+
 void TWI_init(uint8_t deviceId) {
 
     // configure debug pin (PB4) for twi bus
