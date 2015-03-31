@@ -72,14 +72,6 @@
 #define TWI_NO_STATE               0xF8  // No relevant state information available; TWINT = “0”
 #define TWI_BUS_ERROR              0x00  // Bus error due to an illegal START or STOP condition
 
-// TWI application status flags
-uint8_t TWI_isBufferAvailable; 
-uint8_t TWI_isSlaveAddressed;
-
-// callbacks
-void (*generalCallCB)();
-void (*dataReceivedCB)();
-
 void TWI_onGeneralCall(void (*)());
 void TWI_onDataReceived(void (*)());
 char* TWI_getBuffer(void);

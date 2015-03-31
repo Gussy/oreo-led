@@ -24,6 +24,14 @@ static uint8_t TWI_Ptr;
 #define TWI_MAX_BUFFER_SIZE 100
 static char TWI_Buffer[TWI_MAX_BUFFER_SIZE];
 
+// TWI application status flags
+static uint8_t TWI_isBufferAvailable; 
+static uint8_t TWI_isSlaveAddressed;
+
+// callbacks
+static void (*generalCallCB)();
+static void (*dataReceivedCB)();
+
 void TWI_init(uint8_t deviceId) {
 
     // configure debug pin (PB4) for twi bus
