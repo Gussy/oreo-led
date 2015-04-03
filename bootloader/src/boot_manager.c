@@ -12,31 +12,27 @@
 static uint8_t flash_buf[SPM_PAGESIZE];
 static uint16_t flash_addr;
 static uint8_t reply[TWI_SLR_BUFFER_SIZE];
-	
+
 static uint16_t app_version;
+static uint16_t app_length;
+static uint16_t app_checksum;
+static uint16_t app_jump_addr;
 
 void BOOT_processBuffer(void)
-{
-	uint8_t size = TWI_Ptr;
-	uint8_t* twiCommandBuffer = TWI_Buffer;
-	
+{	
     // if command is new, re-parse
     // ensure valid length buffer
     // ensure pointer is valid
-    if (BOOT_isCommandFresh && size > 0) {	
-		// Clear the reply buffer
-		//memset(reply, 0, TWI_SLR_BUFFER_SIZE);
-			
+    if (BOOT_isCommandFresh && TWI_Ptr > 0) {
 		// Check the calculated CRC matches what was sent
-		uint8_t masterXOR = twiCommandBuffer[size-1];
+		uint8_t masterXOR = TWI_Buffer[TWI_Ptr-1];
 		if(masterXOR != TWI_BufferXOR) {
-			debug_pulse(8);
 			TWI_SetReply(reply, 0);
 			BOOT_isCommandFresh = 0;
 			return;
 		}
 
-		switch(twiCommandBuffer[0])
+		switch(TWI_Buffer[0])
 		{
 			case BOOT_CMD_PING:
 				reply[0] = (TWAR>>1);
@@ -54,8 +50,25 @@ void BOOT_processBuffer(void)
 				TWI_SetReply(reply, 4);
 				break;
 			
+			case BOOT_CMD_APP_VER:
+				reply[0] = (TWAR>>1);
+				reply[1] = BOOT_CMD_APP_VER;
+				reply[2] = eeprom_read_byte((uint8_t*)EEPROM_APP_VER_START + 1);
+				reply[3] = eeprom_read_byte((uint8_t*)EEPROM_APP_VER_START);
+				reply[4] = TWI_BufferXOR;
+				TWI_SetReply(reply, 5);
+				break;
+			
+			case BOOT_CMD_APP_CRC:
+				reply[0] = (TWAR>>1);
+				reply[1] = BOOT_CMD_APP_CRC;
+				reply[2] = eeprom_read_byte((uint8_t*)EEPROM_APP_CRC_START + 1);
+				reply[3] = eeprom_read_byte((uint8_t*)EEPROM_APP_CRC_START);
+				reply[4] = TWI_BufferXOR;
+				TWI_SetReply(reply, 5);
+				break;
+			
 			case BOOT_CMD_WRITE_FLASH_A:
-				// Send reply
 				reply[0] = (TWAR>>1);
 				reply[1] = BOOT_CMD_WRITE_FLASH_A;
 				reply[2] = TWI_BufferXOR;
@@ -63,35 +76,35 @@ void BOOT_processBuffer(void)
 				
 				// Clear the 64 byte flash buffer and copy TWI buffer to flash buffer
 				//memset(flash_buf, 0, SPM_PAGESIZE);
-				memcpy(flash_buf, twiCommandBuffer+2, SPM_PAGESIZE/2);
+				memcpy(flash_buf, TWI_Buffer+2, SPM_PAGESIZE/2);
 				
 				// Extract the page byte
-				flash_addr = twiCommandBuffer[1]*SPM_PAGESIZE;
+				flash_addr = TWI_Buffer[1]*SPM_PAGESIZE;
 				break;
 
 			case BOOT_CMD_WRITE_FLASH_B:
-				// Send reply
 				reply[0] = (TWAR>>1);
 				reply[1] = BOOT_CMD_WRITE_FLASH_B;
 				reply[2] = TWI_BufferXOR;
 				TWI_SetReply(reply, 3);
 			
 				// Clear the 64 byte flash buffer and copy TWI buffer to flash buffer
-				memcpy(flash_buf+(SPM_PAGESIZE/2), twiCommandBuffer+1, SPM_PAGESIZE/2);
+				memcpy(flash_buf+(SPM_PAGESIZE/2), TWI_Buffer+1, SPM_PAGESIZE/2);
 				
 				// Schedule a write flash operation
 				BOOT_waitingToFlash = 1;
 				break;
 
 			case BOOT_CMD_FINALISE_FLASH:
-				// Send reply
 				reply[0] = (TWAR>>1);
 				reply[1] = BOOT_CMD_FINALISE_FLASH;
 				reply[2] = TWI_BufferXOR;
 				TWI_SetReply(reply, 3);
 				
-				// Hold the version for writing later
-				app_version = (twiCommandBuffer[1] << 8) | twiCommandBuffer[2];
+				// Hold the version and checksum for writing later
+				app_version = (TWI_Buffer[1] << 8) | TWI_Buffer[2];
+				app_length = (TWI_Buffer[3] << 8) | TWI_Buffer[4];
+				app_checksum = (TWI_Buffer[5] << 8) | TWI_Buffer[6];
 			
 				// Schedule a write flash operation
 				BOOT_waitingToFinalise = 1;
@@ -107,7 +120,7 @@ void BOOT_processBuffer(void)
 				}*/
 				
 				// Send a reply indicating if a boot is possible or not
-				if(eeprom_read_word((uint16_t*)EEPROM_MAGIC_START) == EEPROM_MAGIC) {
+				if(eeprom_read_word((uint16_t*)EEPROM_MAGIC_START) == EEPROM_MAGIC_KEY) {
 					reply[0] = (TWAR>>1);
 					reply[1] = BOOT_CMD_BOOT_APP;
 					reply[2] = TWI_BufferXOR;
@@ -120,10 +133,7 @@ void BOOT_processBuffer(void)
 				break;
 			
 			default:
-				// Send a reply containing the node address and the calculated XOR
-				reply[0] = (TWAR>>1);
-				reply[1] = TWI_BufferXOR;
-				TWI_SetReply(reply, 2);
+				TWI_SetReply(reply, 0);
 				break;
 		}
     }
@@ -134,7 +144,6 @@ void BOOT_processBuffer(void)
 
 void BOOT_write_flash_page(void)
 {
-	debug_pulse(4);
 	// Clear the waiting to flash flag
 	BOOT_waitingToFlash = 0;
 	
@@ -148,11 +157,17 @@ void BOOT_write_flash_page(void)
 	
 	// Preserve the interrupt vector table on the first page
 	if(pagestart == INTVECT_PAGE_ADDRESS) {
+		// Save the real jump address for later
+		app_jump_addr = ((flash_buf[1] << 8) | flash_buf[0]) - (0xC000 - 1); // Little endian...
 		flash_buf[0] = pgm_read_byte(INTVECT_PAGE_ADDRESS + 0);
 		flash_buf[1] = pgm_read_byte(INTVECT_PAGE_ADDRESS + 1);
 		
 		// Also erase the magic EEPROM key and app version
-		eeprom_update_dword((uint32_t*)EEPROM_MAGIC_START, 0xFFFFFFFF);
+		eeprom_update_word((uint16_t*)EEPROM_MAGIC_START, 0xFFFF);
+		eeprom_update_word((uint16_t*)EEPROM_APP_VER_START, 0xFFFF);
+		eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, 0xFFFF);
+		eeprom_update_word((uint16_t*)EEPROM_APP_LEN_START, 0xFFFF);
+		eeprom_update_word((uint16_t*)EEPROM_APP_JMP_ADDR, 0xFFFF);
 		eeprom_busy_wait();
 	}
 	
@@ -171,16 +186,24 @@ void BOOT_write_flash_page(void)
 	// Commit the new page to flash
 	boot_page_write(pagestart);
 	boot_spm_busy_wait();
-	debug_pulse(6);
 }
 
 void BOOT_finalise_flash(void)
-{	
+{
 	// Also erase the magic EEPROM key since there's no going back now...
-	eeprom_update_word((uint16_t*)EEPROM_MAGIC_START, EEPROM_MAGIC);
+	eeprom_update_word((uint16_t*)EEPROM_MAGIC_START, EEPROM_MAGIC_KEY);
 	eeprom_busy_wait();
 	
-	eeprom_update_word((uint16_t*)EEPROM_VERSION_START, app_version);
+	eeprom_update_word((uint16_t*)EEPROM_APP_VER_START, app_version);
+	eeprom_busy_wait();
+	
+	eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, app_checksum);
+	eeprom_busy_wait();
+	
+	eeprom_update_word((uint16_t*)EEPROM_APP_LEN_START, app_length);
+	eeprom_busy_wait();
+	
+	eeprom_update_word((uint16_t*)EEPROM_APP_JMP_ADDR, app_jump_addr);
 	eeprom_busy_wait();
 	
 	// Clear the waiting to finalise flag
