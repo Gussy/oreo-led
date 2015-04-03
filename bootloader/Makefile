@@ -26,6 +26,8 @@ AVRSIZE=avr-size
 AVRGCC=avr-gcc 
 CFLAGS=-Wall -Wpadded -fdata-sections -ffunction-sections -Os -DF_CPU=8000000 -mmcu=${DEVICE} -Iinclude -DBOOTLOADER_START=${BOOTLOADER_START}
 LDFLAGS=-Wl,--section-start=.text=${BOOTLOADER_START}
+#LDFLAGS+=-Wl,--section-start=.data=0x8000C0
+#LDFLAGS+=-Wl,--section-start=.bootreset=0x00
 
 ##############################################
 # High level directives
@@ -43,7 +45,7 @@ clean:
 
 # sets high speed (full rate) clock: 8MHz
 fuse:
-	${PROG} -U lfuse:w:0xEE:m
+	${PROG} -U lfuse:w:0xEE:m hfuse:w:0xDF:m efuse:w:0xFE:m
 
 ##############################################
 # Compile

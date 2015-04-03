@@ -3,7 +3,7 @@
 OBJECT_DIR=build
 SRC_DIR=src
 INCLUDE_DIR=include
-OUTPUT_NAME=main
+OUTPUT_NAME=oreoled
 DEVICE=attiny88
 OBJECTS=${OBJECT_DIR}/light_pattern_protocol.o ${OBJECT_DIR}/twi_manager.o 
 OBJECTS+= ${OBJECT_DIR}/pattern_generator.o ${OBJECT_DIR}/synchro_clock.o
@@ -77,5 +77,7 @@ ${OBJECT_DIR}/${OUTPUT_NAME}.elf: ${OBJECT_DIR}/main.o ${OBJECTS}
 
 ${OBJECT_DIR}/${OUTPUT_NAME}.hex: ${OBJECT_DIR}/${OUTPUT_NAME}.elf
 	${RM} -f ${OBJECT_DIR}/${OUTPUT_NAME}.hex
+	${RM} -f ${OBJECT_DIR}/${OUTPUT_NAME}.bin
 	${AVROBJCOPY} -j .text -j .data -O ihex ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/${OUTPUT_NAME}.hex
+	${AVROBJCOPY} -j .text -j .data -O binary ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/${OUTPUT_NAME}.bin
 	${AVRSIZE} --format=avr --mcu=${DEVICE} ${OBJECT_DIR}/${OUTPUT_NAME}.elf

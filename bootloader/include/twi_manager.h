@@ -27,18 +27,6 @@
 #define TWI_REP_START              0x10  // Repeated START has been transmitted
 #define TWI_ARB_LOST               0x38  // Arbitration lost
 
-// TWI Master Transmitter staus codes                      
-#define TWI_MTX_ADR_ACK            0x18  // SLA+W has been tramsmitted and ACK received
-#define TWI_MTX_ADR_NACK           0x20  // SLA+W has been tramsmitted and NACK received 
-#define TWI_MTX_DATA_ACK           0x28  // Data byte has been tramsmitted and ACK received
-#define TWI_MTX_DATA_NACK          0x30  // Data byte has been tramsmitted and NACK received 
-
-// TWI Master Receiver staus codes  
-#define TWI_MRX_ADR_ACK            0x40  // SLA+R has been tramsmitted and ACK received
-#define TWI_MRX_ADR_NACK           0x48  // SLA+R has been tramsmitted and NACK received
-#define TWI_MRX_DATA_ACK           0x50  // Data byte has been received and ACK tramsmitted
-#define TWI_MRX_DATA_NACK          0x58  // Data byte has been received and NACK tramsmitted
-
 // TWI Slave Transmitter staus codes
 #define TWI_STX_ADR_ACK            0xA8  // Own SLA+R has been received; ACK has been returned
 #define TWI_STX_ADR_ACK_M_ARB_LOST 0xB0  // Arbitration lost in SLA+R/W as Master; own SLA+R has been received; ACK has been returned
@@ -49,12 +37,8 @@
 // TWI Slave Receiver staus codes
 #define TWI_SRX_ADR_ACK            0x60  // Own SLA+W has been received ACK has been returned
 #define TWI_SRX_ADR_ACK_M_ARB_LOST 0x68  // Arbitration lost in SLA+R/W as Master; own SLA+W has been received; ACK has been returned
-#define TWI_SRX_GEN_ACK            0x70  // General call address has been received; ACK has been returned
-#define TWI_SRX_GEN_ACK_M_ARB_LOST 0x78  // Arbitration lost in SLA+R/W as Master; General call address has been received; ACK has been returned
 #define TWI_SRX_ADR_DATA_ACK       0x80  // Previously addressed with own SLA+W; data has been received; ACK has been returned
 #define TWI_SRX_ADR_DATA_NACK      0x88  // Previously addressed with own SLA+W; data has been received; NOT ACK has been returned
-#define TWI_SRX_GEN_DATA_ACK       0x90  // Previously addressed with general call; data has been received; ACK has been returned
-#define TWI_SRX_GEN_DATA_NACK      0x98  // Previously addressed with general call; data has been received; NOT ACK has been returned
 #define TWI_SRX_STOP_RESTART       0xA0  // A STOP condition or repeated START condition has been received while still addressed as Slave
 
 // TWI Miscellaneous status codes
@@ -65,7 +49,8 @@ uint8_t TWI_readIsBusy;
 
 // TWI buffer
 uint8_t TWI_Ptr;
-char TWI_Buffer[TWI_SLW_BUFFER_SIZE];
+uint8_t TWI_Buffer[TWI_SLW_BUFFER_SIZE];
+uint8_t TWI_BufferXOR;
 
 void debug_pulse(uint8_t count);
 
@@ -73,5 +58,7 @@ char* TWI_getBuffer(void);
 uint8_t TWI_getBufferSize(void);
 void TWI_init(void);
 void TWI_SetReply(uint8_t *buf, uint8_t len);
+
+void TWI_Process(void);
 
 #endif
