@@ -20,7 +20,7 @@
 #include "pattern_generator.h"
 #include "utilities.h"
 
-// for use in solo oreoleds, this numver must match the period defined 
+// for use in solo oreoleds, this number must match the period defined 
 //   in the synchro clock header
 #define MAX_PATTERN_PERIOD 4000.0
 
@@ -43,9 +43,9 @@ typedef enum _Light_Protocol_Parameter {
 } LightProtocolParameter;
 
 typedef enum _Light_Param_Macro {
-    PARAM_MACRO_RESET,          // 0
-    PARAM_MACRO_FWUPDATE,       // 1
-    PARAM_MACRO_ENUM_COUNT      // 2
+    PARAM_MACRO_RESET,				// 0
+    PARAM_MACRO_FWUPDATE,			// 1
+    PARAM_MACRO_ENUM_COUNT			// 2
 } LightParamMacro;
 
 static const short int LightParameterSize[PARAM_ENUM_COUNT] = {
@@ -69,13 +69,11 @@ typedef struct _Light_Pattern_Protocol {
     PatternGenerator* bluePattern;
 } LightPatternProtocol;
 
-void LPP_setCommandRefreshed(void);
-void LPP_setRedPatternGen(PatternGenerator*);
-void LPP_setGreenPatternGen(PatternGenerator*);
-void LPP_setBluePatternGen(PatternGenerator*);
-uint8_t LPP_processBuffer(char*, int);
+LightPatternProtocol LPP_pattern_protocol;
+
+uint8_t LPP_processBuffer(void);
 void LPP_setParamMacro(LightParamMacro);
-void _LPP_processParameterUpdate(LightProtocolParameter, int, char*);
+void _LPP_processParameterUpdate(LightProtocolParameter, int);
 void _LPP_setPattern(int);
 
 

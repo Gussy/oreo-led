@@ -23,7 +23,7 @@ PROG=avrdude -c ${PROGRAMMER} -p attiny88
 AVROBJCOPY=avr-objcopy 
 AVRSIZE=avr-size 
 AVRGCC=avr-gcc 
-CFLAGS=-Wall -Wpadded -Os -DF_CPU=8000000 -mmcu=${DEVICE} -Iinclude 
+CFLAGS=-Wall -Wpadded -fdata-sections -ffunction-sections -Os -DF_CPU=8000000 -mmcu=${DEVICE} -Iinclude 
 
 ##############################################
 # High level directives

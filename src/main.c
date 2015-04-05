@@ -40,6 +40,8 @@
 #include "waveform_generator.h"
 #include "node_manager.h"
 
+extern uint8_t NODE_station;
+
 // the watchdog timer remains active even after a system reset 
 //  (except a power-on condition), using the fastest prescaler 
 //  value (approximately 15ms). It is therefore required to turn 
@@ -54,27 +56,16 @@ void get_mcusr(void)
     wdt_disable();
 }
 
-// create pattern generators for all
-//  three LED channels
-PatternGenerator pgRed;
-PatternGenerator pgGreen;
-PatternGenerator pgBlue;
-
 // main program entry point
 int main(void) {
-    
     // init synchro node singleton
     SYNCLK_init();
 
-    uint8_t oldSREG = SREG;
-    cli();
-    // delay to acquire hardware pin settings
-    // and node initialization
-    
+	// init the node system
     NODE_init();
 
     // init TWI node singleton with device ID
-    TWI_init(NODE_getId());
+    TWI_init(NODE_station);
 
     // init the generators
     PG_init(&pgRed);
@@ -83,9 +74,9 @@ int main(void) {
 
     // register pattern generators with the
     //  lighting pattern protocol interface
-    LPP_setRedPatternGen(&pgRed);
-    LPP_setGreenPatternGen(&pgGreen);
-    LPP_setBluePatternGen(&pgBlue);
+	LPP_pattern_protocol.redPattern = &pgRed;
+	LPP_pattern_protocol.greenPattern = &pgGreen;
+	LPP_pattern_protocol.bluePattern = &pgBlue;
 
     // register the pattern generator calculated values
     //  with hardware waveform outputs
@@ -97,36 +88,11 @@ int main(void) {
     //  updates in a coordinated way
     WG_onOverflow(SYNCLK_updateClock);
 
-/*
-    // if previous shutdown was a WDT reset...
-    if (mcusr_mirror & 0x08) {
-				
-        // resume pattern
-        if (NODE_isRestoreStateAvailable()) 
-            NODE_restoreRGBState(&pgRed, &pgGreen, &pgBlue);
-
-        // set wdt to 0.5s and system reset mode
-        NODE_wdt_setHalfSecResetMode();
-        
-        // do not perform startup check
-        NODE_system_status = NODE_STARTUP_SUCCESS;
-
-    } else {
-*/
-        // configure startup health check timer
-        //   to enter 'failed' more (all red LEDs)
-        //   if device has not received any i2c comms
-        //   after NODE_MAX_TIMEOUT_SECONDS
-        NODE_wdt_setOneSecInterruptMode();
-
-        // restore state is not available yet, but will
-        //   possibly be populated in a graceful wdt reset
-        //   by the node manager
-        NODE_setRestoreStateUnavailable();
-
- /*
-    }
- */
+    // configure startup health check timer
+    //   to enter 'failed' more (all red LEDs)
+    //   if device has not received any i2c comms
+    //   after NODE_MAX_TIMEOUT_SECONDS
+    NODE_wdt_setOneSecInterruptMode();
 
     // reset wdt timer
     NODE_wdt_reset();
@@ -134,36 +100,32 @@ int main(void) {
     // enable interrupts 
     sei();
 	
+	double clockPosition;
+	
     // application mainloop 
     while(1) {
-
         // run light effect calculations based
         //   on synchronized clock reference
-        double clockPosition = SYNCLK_getClockPosition();
+        clockPosition = SYNCLK_getClockPosition();
         PG_calc(&pgRed, clockPosition);
         PG_calc(&pgGreen, clockPosition);
         PG_calc(&pgBlue, clockPosition);
-
+		
+		// parse commands per interface contract
+		//  and update pattern generators accordingly
+		//  set startup condition success if a command rcvd
+		if (LPP_processBuffer() &&
+			NODE_system_status != NODE_STARTUP_SUCCESS) {
+			NODE_system_status = NODE_STARTUP_COMMRCVD;
+		}
+		
         // update LED PWM duty cycle
         //   with values computed in pattern generator
         WG_updatePWM();
 
-        // if startup did not fail, enable communications
-        if (NODE_system_status != NODE_STARTUP_FAIL) {
-
-            // calculate time adjustment needed to 
-            //  sync up with system clock signal
-            SYNCLK_calcPhaseCorrection();
-
-            // parse commands per interface contract
-            //  and update pattern generators accordingly
-            //  set startup condition success if a command rcvd
-            if (LPP_processBuffer(TWI_getBuffer(), TWI_getBufferSize()) &&
-                NODE_system_status != NODE_STARTUP_SUCCESS) {
-                NODE_system_status = NODE_STARTUP_COMMRCVD;
-            }
-
-        }
+        // calculate time adjustment needed to 
+        //  sync up with system clock signal
+        SYNCLK_calcPhaseCorrection();
 
         // reset WDT timer only if node startup status has already 
         //   been determined (if startup status is already determined, 
@@ -177,16 +139,12 @@ int main(void) {
 
 }
 
-
 // watchdog timer interrupt vector
 ISR(WDT_vect) {
-
     switch (NODE_system_status) {
-
         // no i2c communications received yet, still waiting
         //  for any command before entering NODE_STARTUP_SUCCESS state
         case NODE_STARTUP_PENDING:
-
             // increment timeout count
             NODE_startup_timeout_seconds++;
 
@@ -197,7 +155,7 @@ ISR(WDT_vect) {
                 // startup has failed, show all red LEDs
                 //   and stop processing further communication
                 LPP_setParamMacro(PARAM_MACRO_RESET);
-                NODE_system_status = NODE_STARTUP_FAIL;
+                //NODE_system_status = NODE_STARTUP_FAIL;
 
             }
 
@@ -210,7 +168,6 @@ ISR(WDT_vect) {
 
         // node received communication, switching to normal op mode
         case NODE_STARTUP_COMMRCVD:
-
             // set wdt to 0.5s and system reset mode
             //   change to normal operation mode, this ISR should
             //   no longer be entered unless a hang occurs
@@ -224,14 +181,11 @@ ISR(WDT_vect) {
 
             break;
 
-        // a system hang ocurred, this is a failure
+        // a system hang occurred, this is a failure
         default:
-
-            // save state and reset
-            NODE_saveRGBState(&pgRed, &pgGreen, &pgBlue);
+			break;
 
     }
 
     return;
-
 }

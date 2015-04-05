@@ -23,10 +23,7 @@
 #include "synchro_clock.h"
 #include "light_pattern_protocol.h"
 
-// TWI buffer
-static uint8_t TWI_Ptr;
-#define TWI_MAX_BUFFER_SIZE 100
-static char TWI_Buffer[TWI_MAX_BUFFER_SIZE];
+extern uint8_t NODE_station;
 
 static uint8_t TWI_SendPtr;
 static uint8_t TWI_ReplyLen;
@@ -72,21 +69,6 @@ void TWI_init(uint8_t deviceId) {
 
 }
 
-// returns pointer to TWI data buffer
-char* TWI_getBuffer(void) {
-
-    return TWI_Buffer;
-
-}
-
-// returns buffer pointer
-uint8_t TWI_getBufferSize(void) {
-    return TWI_Ptr;
-}
-
-// reset bit pattern for TWI control register
-const char TWCR_RESET = TWCR_TWINT | TWCR_TWIE | TWCR_TWEA | TWCR_TWEN;
-
 // TWI ISR
 ISR(TWI_vect) {
 
@@ -112,10 +94,8 @@ ISR(TWI_vect) {
             // set per atmel app note example for SLAR mode
             if (TWI_SendPtr >= TWI_ReplyLen) {
                 TWDR = 0xFF;
-                debug_pulse(4);
             } else {
                 TWDR = TWI_ReplyBuf[TWI_SendPtr++];
-                debug_pulse(TWI_SendPtr);
             }
             TWCR |= (1<<TWINT) | (1<<TWEA);
             break;
@@ -124,11 +104,24 @@ ISR(TWI_vect) {
         // received while still addressed as Slave    
         //   Record the end of a transmission if stop bit received
         case TWI_SRX_STOP_RESTART:
-
             // execute callback when data received
             // and addressed as slave (do not process gen call data)
-            if (TWI_isSlaveAddressed) 
-                LPP_setCommandRefreshed();
+            if (TWI_isSlaveAddressed) {
+				TWI_transmittedXOR = TWI_Buffer[--TWI_Ptr]; // Pop the transmitted XOR from the buffer
+				TWI_calculatedXOR ^= TWI_transmittedXOR; // Double XOR the last byte to remove it from the checksum
+
+				if(TWI_transmittedXOR == TWI_calculatedXOR) {
+					// Send a reply containing the node address and the calculated XOR
+					TWI_ReplyBuf[0] = (TWAR>>1);
+					TWI_ReplyBuf[1] = TWI_calculatedXOR;
+					TWI_ReplyLen = 2;
+				} else {
+					debug_pulse(2);
+					TWI_ReplyLen = 0;
+				}
+				
+				LPP_pattern_protocol.isCommandFresh = 1;
+			}
 
             // reset TWCR
             TWCR = TWCR_RESET;
@@ -142,6 +135,7 @@ ISR(TWI_vect) {
             TWI_Ptr = 0;
             TWI_isBufferAvailable = 1;
             TWI_isSlaveAddressed = 1;
+			TWI_calculatedXOR = (TWAR>>1);
 
             // reset TWCR
             TWCR = TWCR_RESET;
@@ -149,15 +143,17 @@ ISR(TWI_vect) {
 
         // if this unit was addressed and we're receiving
         //   data, continue capturing into buffer
-        case TWI_SRX_ADR_DATA_ACK: 
+        case TWI_SRX_ADR_DATA_ACK:
 
             // record received data 
             //   until buffer is full
             if (TWI_Ptr == TWI_MAX_BUFFER_SIZE) 
                 TWI_isBufferAvailable = 0;
 
-            if (TWI_isBufferAvailable)
+            if (TWI_isBufferAvailable) {
                 TWI_Buffer[TWI_Ptr++] = TWDR;
+				TWI_calculatedXOR ^= TWI_Buffer[TWI_Ptr-1];
+			}
 
             // reset TWCR
             TWCR = TWCR_RESET;
@@ -202,7 +198,7 @@ ISR(TWI_vect) {
 
 			// re-init device
 			// slave address will be lost in this case
-			TWI_init(NODE_getId());
+			TWI_init(NODE_station);
 			break;
 
         // something horrible and upforeseen has happened
@@ -213,20 +209,10 @@ ISR(TWI_vect) {
             // default case 
             //  assert PB4 for debug
             //PORTB |= 0b00010000;
-			debug_pulse(4); 
+			//debug_pulse(4);
             
     }
 
     // always release clock line
     TWCR |= TWCR_TWINT;
-}
-
-void TWI_SetReply(uint8_t *buf, uint8_t len)
-{
-    TWI_ReplyLen = 0;
-    if (len > sizeof(TWI_ReplyBuf)) {
-        len = sizeof(TWI_ReplyBuf);
-    }
-    memcpy(TWI_ReplyBuf, buf, len);
-    TWI_ReplyLen = len;
 }

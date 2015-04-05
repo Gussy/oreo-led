@@ -55,6 +55,12 @@ typedef struct _Pattern_Generator_State {
 
 } PatternGenerator;
 
+// create pattern generators for all
+//  three LED channels
+PatternGenerator pgRed;
+PatternGenerator pgGreen;
+PatternGenerator pgBlue;
+
 void PG_init(PatternGenerator*);
 void PG_calc(PatternGenerator*, double);
 void _PG_calcTheta(PatternGenerator*, double);

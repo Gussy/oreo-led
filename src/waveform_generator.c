@@ -137,9 +137,6 @@ void WG_updatePWM(void) {
 
 }
 
-
-
-
 // execute a callback on timer1 overflow
 ISR(TIMER1_OVF_vect) {
 

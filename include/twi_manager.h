@@ -72,9 +72,18 @@
 #define TWI_NO_STATE               0xF8  // No relevant state information available; TWINT = “0”
 #define TWI_BUS_ERROR              0x00  // Bus error due to an illegal START or STOP condition
 
+// Reset bit pattern for TWI control register
+#define TWCR_RESET	TWCR_TWINT | TWCR_TWIE | TWCR_TWEA | TWCR_TWEN
+
+// TWI buffer
+#define TWI_MAX_BUFFER_SIZE 100
+uint8_t TWI_Ptr;
+uint8_t TWI_Buffer[TWI_MAX_BUFFER_SIZE];
+uint8_t TWI_transmittedXOR;
+uint8_t TWI_calculatedXOR;
+
 char* TWI_getBuffer(void);
 uint8_t TWI_getBufferSize(void);
 void TWI_init(uint8_t);
-void TWI_SetReply(uint8_t *buf, uint8_t len);
 
 #endif
