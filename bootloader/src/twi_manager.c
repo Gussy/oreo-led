@@ -18,29 +18,35 @@ static uint8_t TWI_isBufferAvailable;
 static void TWI_Process_Slave_Receive(void);
 static void TWI_Process_Slave_Transmit(void);
 
+extern uint8_t NODE_station;
+
+#if 0
 void debug_pulse(uint8_t count)
 {
     while (count--) {
-        PORTB |= 0b00010000;         
+        PORTB |= 0b00010000;
         _delay_us(1);
-        PORTB &= ~0b00010000;         
+        PORTB &= ~0b00010000;
         _delay_us(1);
     }
 }
+#endif
 
 void TWI_init(void) {
 
+#if 0
     // configure debug pin (PB4) for twi bus
     //  error detection, set PB4 to output low.
     //  if PB4 is ever asserted high, an error has
     //  been detected
     DDRB |= 0b00010000; 
     PORTB &= 0b11101111;
+#endif
 
     // calculate slave address
     // 8-bit address is 0xD0, 0xD2,
     //   0xD4, 0xD6, 7-bit is 0x68 ~ 0x6B
-    uint8_t TWI_SLAVE_ADDRESS = (TWI_BASE_ADDRESS + (NODE_getId() << 1));
+    uint8_t TWI_SLAVE_ADDRESS = (TWI_BASE_ADDRESS + (NODE_station << 1));
 
     // TWI Config
     TWAR = TWI_SLAVE_ADDRESS;

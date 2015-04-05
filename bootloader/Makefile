@@ -3,7 +3,7 @@
 OBJECT_DIR=build
 SRC_DIR=src
 INCLUDE_DIR=include
-OUTPUT_NAME=main
+OUTPUT_NAME=oreoled-bootloader
 DEVICE=attiny88
 OBJECTS=${OBJECT_DIR}/twi_manager.o
 OBJECTS+= ${OBJECT_DIR}/node_manager.o ${OBJECT_DIR}/boot_manager.o

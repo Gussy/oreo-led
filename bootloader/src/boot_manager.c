@@ -18,6 +18,8 @@ static uint16_t app_length;
 static uint16_t app_checksum;
 static uint16_t app_jump_addr;
 
+extern uint8_t NODE_station;
+
 void BOOT_processBuffer(void)
 {	
     // if command is new, re-parse

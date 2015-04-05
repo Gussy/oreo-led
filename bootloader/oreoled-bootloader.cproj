@@ -22,10 +22,10 @@
     <ProgFlashFromRam>true</ProgFlashFromRam>
     <RamSnippetAddress>0x20000000</RamSnippetAddress>
     <UncachedRange />
-    <preserveEEPROM>true</preserveEEPROM>
+    <preserveEEPROM>false</preserveEEPROM>
     <OverrideVtorValue>exception_table</OverrideVtorValue>
     <BootSegment>2</BootSegment>
-    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <eraseonlaunchrule>1</eraseonlaunchrule>
     <AsfFrameworkConfig>
       <framework-data xmlns="">
         <options />
@@ -38,7 +38,7 @@
         </dependencies>
       </framework-data>
     </AsfFrameworkConfig>
-    <avrtool>com.atmel.avrdbg.tool.ispmk2</avrtool>
+    <avrtool>com.atmel.avrdbg.tool.jtagice3plus</avrtool>
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions>
         <InterfaceProperties>
@@ -51,11 +51,11 @@
       </ToolNumber>
       <ToolName>Simulator</ToolName>
     </com_atmel_avrdbg_tool_simulator>
-    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterface>debugWIRE</avrtoolinterface>
     <com_atmel_avrdbg_tool_ispmk2>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>500000</IspClock>
+          <IspClock>125000</IspClock>
         </InterfaceProperties>
         <InterfaceName>ISP</InterfaceName>
       </ToolOptions>
@@ -63,6 +63,18 @@
       <ToolNumber>000200211942</ToolNumber>
       <ToolName>AVRISP mkII</ToolName>
     </com_atmel_avrdbg_tool_ispmk2>
+    <com_atmel_avrdbg_tool_jtagice3plus>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+          <DebugWireClockDiv>8000</DebugWireClockDiv>
+        </InterfaceProperties>
+        <InterfaceName>debugWIRE</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.jtagice3plus</ToolType>
+      <ToolNumber>J30200014003</ToolNumber>
+      <ToolName>JTAGICE3</ToolName>
+    </com_atmel_avrdbg_tool_jtagice3plus>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -120,11 +132,10 @@
       </AvrGcc>
     </ToolchainSettings>
     <UsesExternalMakeFile>True</UsesExternalMakeFile>
-    <OutputDirectory>
-    </OutputDirectory>
     <BuildTarget>all</BuildTarget>
     <CleanTarget>clean</CleanTarget>
     <ExternalMakeFilePath>Makefile</ExternalMakeFilePath>
+    <OutputDirectory />
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="include\" />
