@@ -66,8 +66,8 @@
     <com_atmel_avrdbg_tool_jtagice3plus>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>125000</IspClock>
-          <DebugWireClockDiv>8000</DebugWireClockDiv>
+          <IspClock>1000000</IspClock>
+          <DebugWireClockDiv>0</DebugWireClockDiv>
         </InterfaceProperties>
         <InterfaceName>debugWIRE</InterfaceName>
       </ToolOptions>

@@ -51,6 +51,7 @@ uint8_t TWI_readIsBusy;
 uint8_t TWI_Ptr;
 uint8_t TWI_Buffer[TWI_SLW_BUFFER_SIZE];
 uint8_t TWI_BufferXOR;
+uint8_t TWI_masterXOR;
 
 void debug_pulse(uint8_t count);
 

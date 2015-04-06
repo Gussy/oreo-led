@@ -53,6 +53,8 @@
  */
 
 // Commands
+#define OREOLED_PROBE			0xAA
+
 #define BOOT_CMD_PING			0x40
 #define BOOT_CMD_BL_VER			0x41
 #define BOOT_CMD_APP_VER		0x42
@@ -77,5 +79,6 @@ void BOOT_setCommandRefreshed(void);
 void BOOT_processBuffer(void);
 void BOOT_write_flash_page(void);
 void BOOT_finalise_flash(void);
+void BOOT_updateAppChecksum(void);
 
 #endif /* BOOT_MANAGER_H */

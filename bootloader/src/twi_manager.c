@@ -86,6 +86,7 @@ static void TWI_Process_Slave_Receive(void) {
 			case TWI_SRX_ADR_DATA_NACK:
 			case TWI_SRX_STOP_RESTART:
 				TWCR = TWCR_RESET;
+				TWI_masterXOR = TWI_Buffer[--TWI_Ptr];
 				BOOT_isCommandFresh = 1;
 				rx_finished = 1;
 				break;
@@ -97,7 +98,7 @@ static void TWI_Process_Slave_Receive(void) {
 	} while(!rx_finished);
 	
 	// XOR against the last byte again to reverse that XOR...
-	TWI_BufferXOR ^= TWI_Buffer[TWI_Ptr-1];
+	TWI_BufferXOR ^= TWI_masterXOR;
 }
 
 static void TWI_Process_Slave_Transmit(void) {

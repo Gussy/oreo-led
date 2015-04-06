@@ -19,16 +19,18 @@ static uint16_t app_checksum;
 static uint16_t app_jump_addr;
 
 extern uint8_t NODE_station;
+extern uint8_t TWI_masterXOR;
+extern uint8_t TWI_BufferXOR;
 
 void BOOT_processBuffer(void)
 {	
     // if command is new, re-parse
     // ensure valid length buffer
     // ensure pointer is valid
-    if (BOOT_isCommandFresh && TWI_Ptr > 0) {
+    if (BOOT_isCommandFresh && TWI_Ptr > 0) {	
+
 		// Check the calculated CRC matches what was sent
-		uint8_t masterXOR = TWI_Buffer[TWI_Ptr-1];
-		if(masterXOR != TWI_BufferXOR) {
+		if(TWI_masterXOR != TWI_BufferXOR) {
 			TWI_SetReply(reply, 0);
 			BOOT_isCommandFresh = 0;
 			return;
@@ -36,6 +38,12 @@ void BOOT_processBuffer(void)
 
 		switch(TWI_Buffer[0])
 		{
+			case OREOLED_PROBE:
+				reply[0] = (TWAR>>1);
+				reply[1] = TWI_BufferXOR;
+				TWI_SetReply(reply, 2);
+				break;
+			
 			case BOOT_CMD_PING:
 				reply[0] = (TWAR>>1);
 				reply[1] = BOOT_CMD_PING;
@@ -199,15 +207,33 @@ void BOOT_finalise_flash(void)
 	eeprom_update_word((uint16_t*)EEPROM_APP_VER_START, app_version);
 	eeprom_busy_wait();
 	
-	eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, app_checksum);
-	eeprom_busy_wait();
-	
 	eeprom_update_word((uint16_t*)EEPROM_APP_LEN_START, app_length);
 	eeprom_busy_wait();
 	
 	eeprom_update_word((uint16_t*)EEPROM_APP_JMP_ADDR, app_jump_addr);
 	eeprom_busy_wait();
 	
+	// Update the checksum of the application flash
+	BOOT_updateAppChecksum();
+	
 	// Clear the waiting to finalise flag
 	BOOT_waitingToFinalise = 0;
+}
+
+void BOOT_updateAppChecksum(void)
+{
+	/* Calculate application checksum */
+	uint16_t i, j;
+	uint16_t calced_checksum = 0x0000;
+	
+	j = eeprom_read_word((uint16_t*)EEPROM_APP_LEN_START);
+	
+	if(j >= BOOTLOADER_START)
+		return;
+	
+	for(i = 2; i < -1; i+=2) {
+		calced_checksum ^= (pgm_read_byte(i) << 8) | pgm_read_byte(i+1);
+	}
+	eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, calced_checksum);
+	eeprom_busy_wait();
 }
