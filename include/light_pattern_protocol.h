@@ -45,7 +45,18 @@ typedef enum _Light_Protocol_Parameter {
 typedef enum _Light_Param_Macro {
     PARAM_MACRO_RESET,				// 0
     PARAM_MACRO_FWUPDATE,			// 1
-    PARAM_MACRO_ENUM_COUNT			// 2
+	PARAM_MACRO_AUTOPILOT,			// 2
+	PARAM_MACRO_CALIBRATE,			// 3
+	PARAM_MACRO_POWERON,			// 4
+	PARAM_MACRO_POWEROFF,		    // 5
+	PARAM_MACRO_RED,				// 6
+	PARAM_MACRO_GREEN,				// 7
+	PARAM_MACRO_BLUE,				// 8
+	PARAM_MACRO_AMBER,				// 9
+	PARAM_MACRO_WHITE,				// 10
+	PARAM_MACRO_AUTOMOBILE_COLORS,  // 11
+	PARAM_MACRO_AVIATION_COLORS,    // 12
+    PARAM_MACRO_ENUM_COUNT			// 13
 } LightParamMacro;
 
 static const short int LightParameterSize[PARAM_ENUM_COUNT] = {
@@ -64,6 +75,7 @@ static const short int LightParameterSize[PARAM_ENUM_COUNT] = {
 
 typedef struct _Light_Pattern_Protocol {
     uint8_t isCommandFresh;
+	int8_t	cyclesRemaining;
     PatternGenerator* redPattern;
     PatternGenerator* greenPattern;
     PatternGenerator* bluePattern;

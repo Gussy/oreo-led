@@ -43,15 +43,15 @@ typedef enum _Pattern_Enum {
 
 typedef struct _Pattern_Generator_State {
     
-    int cyclesRemaining; 
+    int8_t cyclesRemaining; 
     PatternEnum pattern;
     double theta;
-    double speed;
+    uint8_t speed;
     double phase;
-    double amplitude;
-    double bias;
+    uint8_t amplitude;
+    uint8_t bias;
     uint8_t value;
-    char isNewCycle;
+    uint8_t isNewCycle;
 
 } PatternGenerator;
 

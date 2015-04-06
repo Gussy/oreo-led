@@ -183,6 +183,86 @@ void _LPP_processParameterUpdate(LightProtocolParameter param, int start) {
 void LPP_setParamMacro(LightParamMacro macro) {
     
     switch(macro) {
+		case PARAM_MACRO_AUTOMOBILE_COLORS:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+		
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+		
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			switch(NODE_station) {
+				case 2:  // Front
+				case 3:
+					LPP_pattern_protocol.redPattern->amplitude        = 125;
+					LPP_pattern_protocol.redPattern->bias             = 125;
+					LPP_pattern_protocol.greenPattern->amplitude      = 125;
+					LPP_pattern_protocol.greenPattern->bias           = 125;
+					LPP_pattern_protocol.bluePattern->amplitude       = 125;
+					LPP_pattern_protocol.bluePattern->bias            = 125;
+					break;
+				default:  // Rear
+					LPP_pattern_protocol.redPattern->amplitude        = 125;
+					LPP_pattern_protocol.redPattern->bias             = 125;
+					LPP_pattern_protocol.greenPattern->amplitude      = 0;
+					LPP_pattern_protocol.greenPattern->bias           = 0;
+					LPP_pattern_protocol.bluePattern->amplitude       = 0;
+					LPP_pattern_protocol.bluePattern->bias            = 0;
+			}
+			_LPP_setPattern(PATTERN_FADEIN);
+			break;
+		
+
+		case PARAM_MACRO_AVIATION_COLORS:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+		
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+		
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->theta                = 0;
+			LPP_pattern_protocol.greenPattern->theta              = 0;
+			LPP_pattern_protocol.bluePattern->theta               = 0;
+
+			switch(NODE_station) {
+				case 2:  // Front Left
+				LPP_pattern_protocol.redPattern->amplitude        = 125;
+				LPP_pattern_protocol.redPattern->bias             = 125;
+				LPP_pattern_protocol.greenPattern->amplitude      = 0;
+				LPP_pattern_protocol.greenPattern->bias           = 0;
+				LPP_pattern_protocol.bluePattern->amplitude       = 0;
+				LPP_pattern_protocol.bluePattern->bias            = 0;
+				break;
+				case 3:  // Front Right
+				LPP_pattern_protocol.redPattern->amplitude        = 0;
+				LPP_pattern_protocol.redPattern->bias             = 0;
+				LPP_pattern_protocol.greenPattern->amplitude      = 125;
+				LPP_pattern_protocol.greenPattern->bias           = 125;
+				LPP_pattern_protocol.bluePattern->amplitude       = 0;
+				LPP_pattern_protocol.bluePattern->bias            = 0;
+				break;
+				default:  //  Rear lights
+				LPP_pattern_protocol.redPattern->amplitude        = 125;
+				LPP_pattern_protocol.redPattern->bias             = 125;
+				LPP_pattern_protocol.greenPattern->amplitude      = 125;
+				LPP_pattern_protocol.greenPattern->bias           = 125;
+				LPP_pattern_protocol.bluePattern->amplitude       = 125;
+				LPP_pattern_protocol.bluePattern->bias            = 125;
+			}
+			_LPP_setPattern(PATTERN_FADEIN);
+		break;
+		
         case PARAM_MACRO_FWUPDATE:
             LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
             LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
@@ -205,6 +285,207 @@ void LPP_setParamMacro(LightParamMacro macro) {
 
             _LPP_setPattern(PATTERN_SINE);
             break;
+		
+		case PARAM_MACRO_AUTOPILOT:
+			// USES PREVIOUSLY SET BIAS/AMPLITUDE
+			// AUTOPILOT MACRO SHOULD BE CALLED AFTER
+			// A COLOR SETTING HAS BEEN ISSUED
+
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+
+			LPP_pattern_protocol.redPattern->speed                = 2;
+			LPP_pattern_protocol.greenPattern->speed              = 2;
+			LPP_pattern_protocol.bluePattern->speed               = 2;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			_LPP_setPattern(PATTERN_SINE);
+			break;
+			
+		/*case PARAM_MACRO_CALIBRATE:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+
+			LPP_pattern_protocol.redPattern->speed                = 12;
+			LPP_pattern_protocol.greenPattern->speed              = 12;
+			LPP_pattern_protocol.bluePattern->speed               = 12;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->bias                 = 0;
+			LPP_pattern_protocol.greenPattern->bias               = 0;
+			LPP_pattern_protocol.bluePattern->bias                = 0;
+
+			_LPP_setPattern(PATTERN_STROBE);
+			break;
+
+		case PARAM_MACRO_POWERON:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = 1;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = 1;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = 1;
+
+			LPP_pattern_protocol.redPattern->speed                = 2;
+			LPP_pattern_protocol.greenPattern->speed              = 2;
+			LPP_pattern_protocol.bluePattern->speed               = 2;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = 0;
+			LPP_pattern_protocol.redPattern->bias                 = 0;
+			LPP_pattern_protocol.greenPattern->amplitude          = 115;
+			LPP_pattern_protocol.greenPattern->bias               = 120;
+			LPP_pattern_protocol.bluePattern->amplitude           = 0;
+			LPP_pattern_protocol.bluePattern->bias                = 0;
+
+			_LPP_setPattern(PATTERN_FADEIN);
+			break;*/
+		
+		case PARAM_MACRO_POWEROFF:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = 1;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = 1;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = 1;
+
+			LPP_pattern_protocol.redPattern->speed                = 2;
+			LPP_pattern_protocol.greenPattern->speed              = 2;
+			LPP_pattern_protocol.bluePattern->speed               = 2;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = LPP_pattern_protocol.redPattern->value;
+			LPP_pattern_protocol.redPattern->bias                 = 0;
+			LPP_pattern_protocol.greenPattern->amplitude          = LPP_pattern_protocol.greenPattern->value;
+			LPP_pattern_protocol.greenPattern->bias               = 0;
+			LPP_pattern_protocol.bluePattern->amplitude           = LPP_pattern_protocol.bluePattern->value;
+			LPP_pattern_protocol.bluePattern->bias                = 0;
+
+			_LPP_setPattern(PATTERN_FADEOUT);
+			break;
+		
+		case PARAM_MACRO_RED:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+		
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = 115;
+			LPP_pattern_protocol.redPattern->bias                 = 120;
+			LPP_pattern_protocol.greenPattern->amplitude          = 0;
+			LPP_pattern_protocol.greenPattern->bias               = 0;
+			LPP_pattern_protocol.bluePattern->amplitude           = 0;
+			LPP_pattern_protocol.bluePattern->bias                = 0;
+
+			_LPP_setPattern(PATTERN_SOLID);
+			break;
+		
+		/*case PARAM_MACRO_GREEN:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = 0;
+			LPP_pattern_protocol.redPattern->bias                 = 0;
+			LPP_pattern_protocol.greenPattern->amplitude          = 115;
+			LPP_pattern_protocol.greenPattern->bias               = 120;
+			LPP_pattern_protocol.bluePattern->amplitude           = 0;
+			LPP_pattern_protocol.bluePattern->bias                = 0;
+
+			_LPP_setPattern(PATTERN_SOLID);
+			break;
+		
+		case PARAM_MACRO_BLUE:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+		
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = 0;
+			LPP_pattern_protocol.redPattern->bias                 = 0;
+			LPP_pattern_protocol.greenPattern->amplitude          = 0;
+			LPP_pattern_protocol.greenPattern->bias               = 0;
+			LPP_pattern_protocol.bluePattern->amplitude           = 115;
+			LPP_pattern_protocol.bluePattern->bias                = 120;
+
+			_LPP_setPattern(PATTERN_SOLID);
+			break;*/
+		
+		case PARAM_MACRO_AMBER:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+		
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = 115;
+			LPP_pattern_protocol.redPattern->bias                 = 120;
+			LPP_pattern_protocol.greenPattern->amplitude          = 45;
+			LPP_pattern_protocol.greenPattern->bias               = 50;
+			LPP_pattern_protocol.bluePattern->amplitude           = 0;
+			LPP_pattern_protocol.bluePattern->bias                = 0;
+
+			_LPP_setPattern(PATTERN_SOLID);
+			break;
+		
+		case PARAM_MACRO_WHITE:
+			LPP_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+		
+			LPP_pattern_protocol.redPattern->speed                = 1;
+			LPP_pattern_protocol.greenPattern->speed              = 1;
+			LPP_pattern_protocol.bluePattern->speed               = 1;
+
+			LPP_pattern_protocol.redPattern->phase                = 0;
+			LPP_pattern_protocol.greenPattern->phase              = 0;
+			LPP_pattern_protocol.bluePattern->phase               = 0;
+
+			LPP_pattern_protocol.redPattern->amplitude            = 115;
+			LPP_pattern_protocol.redPattern->bias                 = 120;
+			LPP_pattern_protocol.greenPattern->amplitude          = 95;
+			LPP_pattern_protocol.greenPattern->bias               = 100;
+			LPP_pattern_protocol.bluePattern->amplitude           = 27;
+			LPP_pattern_protocol.bluePattern->bias                = 30;
+
+			_LPP_setPattern(PATTERN_SOLID);
+			break;
 
         case PARAM_MACRO_RESET:
             PG_init(LPP_pattern_protocol.redPattern);
