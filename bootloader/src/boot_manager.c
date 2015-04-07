@@ -78,6 +78,18 @@ void BOOT_processBuffer(void)
 				TWI_SetReply(reply, 5);
 				break;
 			
+			case BOOT_CMD_SET_COLOUR:
+				reply[0] = (TWAR>>1);
+				reply[1] = BOOT_CMD_SET_COLOUR;
+				reply[3] = TWI_BufferXOR;
+				TWI_SetReply(reply, 3);
+				
+				eeprom_write_byte((uint8_t*)EEPROM_BOOT_RED, TWI_Buffer[1]);
+				eeprom_busy_wait();
+				eeprom_write_byte((uint8_t*)EEPROM_BOOT_GREEN, TWI_Buffer[2]);
+				eeprom_busy_wait();
+				break;
+			
 			case BOOT_CMD_WRITE_FLASH_A:
 				reply[0] = (TWAR>>1);
 				reply[1] = BOOT_CMD_WRITE_FLASH_A;
@@ -121,25 +133,20 @@ void BOOT_processBuffer(void)
 				break;
 
 			case BOOT_CMD_BOOT_APP:
-				/* Checking the nonce doesn't work for some magical reason
-				 * If we got this far we have essentially checked it via.
-				 * the CRC check anyway, so we assume it's a valid boot command
-				 */
-				/*if(twiCommandBuffer[1] == BOOT_CMD_BOOT_NONCE) {
-					BOOT_shouldBootApp = 1;
-				}*/
-				
 				// Send a reply indicating if a boot is possible or not
 				temp = eeprom_read_word((uint16_t*)EEPROM_MAGIC_START);
-				if(temp == EEPROM_MAGIC_KEY) {
+				if(TWI_Buffer[1] == BOOT_CMD_BOOT_NONCE &&
+					temp == EEPROM_MAGIC_KEY) {
 					reply[0] = (TWAR>>1);
 					reply[1] = BOOT_CMD_BOOT_APP;
 					reply[2] = TWI_BufferXOR;
 					TWI_SetReply(reply, 3);
 					BOOT_shouldBootApp = 1;
 				} else {
+					// Reply with the boot nonce to indicate that the command
+					//  was successful but the boot jump was not possible
 					reply[0] = (TWAR>>1);
-					reply[1] = 0x00;
+					reply[1] = BOOT_CMD_BOOT_NONCE;
 					reply[2] = TWI_BufferXOR;
 					TWI_SetReply(reply, 3);
 				}

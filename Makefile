@@ -41,7 +41,7 @@ clean:
 
 # sets high speed (full rate) clock: 8MHz
 fuse:
-	${PROG} -U lfuse:w:0xEE:m
+	${PROG} -U lfuse:w:0xEE:m -U hfuse:w:0xDD:m -u efuse:w:0xFE:m
 
 ##############################################
 # Compile
