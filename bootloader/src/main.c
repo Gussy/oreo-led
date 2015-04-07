@@ -6,6 +6,7 @@
 #include <avr/pgmspace.h>
 #include <avr/boot.h>
 #include <avr/eeprom.h>
+#include <avr/interrupt.h>
 #include <util/twi.h>
 #include <util/delay.h>
 
@@ -88,11 +89,6 @@ int main(void)
 	
 	// Store the current application checksum in the EEPROM for querying later
 	BOOT_updateAppChecksum();
-	
-	// If the app checksum is valid, we could jump to it
-	/*if(calced_checksum == eeprom_read_word((uint16_t*)EEPROM_APP_CRC_START))) {
-		jump_to_app();
-	}*/
 
 	#define TCCR1A_PWM_MODE		0b10100000
 	#define TCCR1A_FAST_PWM8	0b00000001
@@ -130,7 +126,7 @@ int main(void)
 	
 	OCR1AL = pwm_green;
 	OCR1BL = pwm_red;
-
+	
     while(1) {
 		// Process the TWI peripheral
 		TWI_Process();
@@ -146,7 +142,7 @@ int main(void)
 			// Process a waiting finalise after TWI transactions
 			if(BOOT_waitingToFinalise) {
 				BOOT_finalise_flash();
-				jump_to_app = (void*)eeprom_read_word((uint16_t*)EEPROM_APP_JMP_ADDR);
+				jump_to_app = (void*)app_jump_addr;
 			}
 			
 			// Boot the app if required and if the response is set

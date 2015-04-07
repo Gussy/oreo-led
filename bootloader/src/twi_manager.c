@@ -99,6 +99,9 @@ static void TWI_Process_Slave_Receive(void) {
 	
 	// XOR against the last byte again to reverse that XOR...
 	TWI_BufferXOR ^= TWI_masterXOR;
+	
+	// always release clock line
+	TWCR |= (1<<TWINT);
 }
 
 static void TWI_Process_Slave_Transmit(void) {
@@ -133,6 +136,9 @@ static void TWI_Process_Slave_Transmit(void) {
 	} while(!tx_finished);
 	
 	TWI_readIsBusy = 0;
+	
+	// always release clock line
+	TWCR |= (1<<TWINT);
 }
 
 // TWI

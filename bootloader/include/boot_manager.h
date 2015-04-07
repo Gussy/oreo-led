@@ -74,6 +74,7 @@ uint8_t BOOT_isCommandFresh;
 uint8_t BOOT_waitingToFlash;
 uint8_t BOOT_waitingToFinalise;
 uint8_t BOOT_shouldBootApp;
+uint16_t app_jump_addr;
 
 void BOOT_setCommandRefreshed(void);
 void BOOT_processBuffer(void);

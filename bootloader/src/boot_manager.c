@@ -16,7 +16,6 @@ static uint8_t reply[TWI_SLR_BUFFER_SIZE];
 static uint16_t app_version;
 static uint16_t app_length;
 static uint16_t app_checksum;
-static uint16_t app_jump_addr;
 
 extern uint8_t NODE_station;
 extern uint8_t TWI_masterXOR;
@@ -35,7 +34,8 @@ void BOOT_processBuffer(void)
 			BOOT_isCommandFresh = 0;
 			return;
 		}
-
+		
+		uint16_t temp;
 		switch(TWI_Buffer[0])
 		{
 			case OREOLED_PROBE:
@@ -130,14 +130,18 @@ void BOOT_processBuffer(void)
 				}*/
 				
 				// Send a reply indicating if a boot is possible or not
-				if(eeprom_read_word((uint16_t*)EEPROM_MAGIC_START) == EEPROM_MAGIC_KEY) {
+				temp = eeprom_read_word((uint16_t*)EEPROM_MAGIC_START);
+				if(temp == EEPROM_MAGIC_KEY) {
 					reply[0] = (TWAR>>1);
 					reply[1] = BOOT_CMD_BOOT_APP;
 					reply[2] = TWI_BufferXOR;
 					TWI_SetReply(reply, 3);
 					BOOT_shouldBootApp = 1;
 				} else {
-					TWI_SetReply(reply, 0);
+					reply[0] = (TWAR>>1);
+					reply[1] = 0x00;
+					reply[2] = TWI_BufferXOR;
+					TWI_SetReply(reply, 3);
 				}
 				
 				break;
@@ -174,9 +178,13 @@ void BOOT_write_flash_page(void)
 		
 		// Also erase the magic EEPROM key and app version
 		eeprom_update_word((uint16_t*)EEPROM_MAGIC_START, 0xFFFF);
+		eeprom_busy_wait();
 		eeprom_update_word((uint16_t*)EEPROM_APP_VER_START, 0xFFFF);
+		eeprom_busy_wait();
 		eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, 0xFFFF);
+		eeprom_busy_wait();
 		eeprom_update_word((uint16_t*)EEPROM_APP_LEN_START, 0xFFFF);
+		eeprom_busy_wait();
 		eeprom_update_word((uint16_t*)EEPROM_APP_JMP_ADDR, 0xFFFF);
 		eeprom_busy_wait();
 	}
@@ -223,15 +231,15 @@ void BOOT_finalise_flash(void)
 void BOOT_updateAppChecksum(void)
 {
 	/* Calculate application checksum */
-	uint16_t i, j;
+	uint16_t i, app_len;
 	uint16_t calced_checksum = 0x0000;
 	
-	j = eeprom_read_word((uint16_t*)EEPROM_APP_LEN_START);
+	app_len = eeprom_read_word((uint16_t*)EEPROM_APP_LEN_START);
 	
-	if(j >= BOOTLOADER_START)
+	if(app_len >= BOOTLOADER_START)
 		return;
 	
-	for(i = 2; i < -1; i+=2) {
+	for(i = 2; i < app_len; i+=2) {
 		calced_checksum ^= (pgm_read_byte(i) << 8) | pgm_read_byte(i+1);
 	}
 	eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, calced_checksum);
