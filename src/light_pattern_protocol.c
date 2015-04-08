@@ -206,6 +206,87 @@ void LPP_setParamMacro(LightParamMacro macro) {
     
     switch(macro) {
 
+    case PARAM_MACRO_AUTOMOBILE_COLORS:
+	_self_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+	_self_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+	_self_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+	
+	_self_pattern_protocol.redPattern->speed                = 1;
+	_self_pattern_protocol.greenPattern->speed              = 1;
+	_self_pattern_protocol.bluePattern->speed               = 1;
+	
+	_self_pattern_protocol.redPattern->phase                = 0;
+	_self_pattern_protocol.greenPattern->phase              = 0;
+	_self_pattern_protocol.bluePattern->phase               = 0;
+
+	switch(NODE_getId()) {
+	case 2:  // Front
+	case 3:
+	    _self_pattern_protocol.redPattern->amplitude        = 125;
+	    _self_pattern_protocol.redPattern->bias             = 125;
+	    _self_pattern_protocol.greenPattern->amplitude      = 125;
+	    _self_pattern_protocol.greenPattern->bias           = 125;
+	    _self_pattern_protocol.bluePattern->amplitude       = 125;
+	    _self_pattern_protocol.bluePattern->bias            = 125;
+	    break;
+	default:  // Rear
+	    _self_pattern_protocol.redPattern->amplitude        = 125;
+	    _self_pattern_protocol.redPattern->bias             = 125;
+	    _self_pattern_protocol.greenPattern->amplitude      = 0;
+	    _self_pattern_protocol.greenPattern->bias           = 0;
+	    _self_pattern_protocol.bluePattern->amplitude       = 0;
+	    _self_pattern_protocol.bluePattern->bias            = 0;
+	}
+	_LPP_setPattern(PATTERN_FADEIN);
+	break;
+	
+
+    case PARAM_MACRO_AVIATION_COLORS:
+	_self_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
+	_self_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;
+	_self_pattern_protocol.bluePattern->cyclesRemaining     = CYCLES_INFINITE;
+	
+	_self_pattern_protocol.redPattern->speed                = 1;
+	_self_pattern_protocol.greenPattern->speed              = 1;
+	_self_pattern_protocol.bluePattern->speed               = 1;
+	
+	_self_pattern_protocol.redPattern->phase                = 0;
+	_self_pattern_protocol.greenPattern->phase              = 0;
+	_self_pattern_protocol.bluePattern->phase               = 0;
+
+	_self_pattern_protocol.redPattern->theta                = 0;
+	_self_pattern_protocol.greenPattern->theta              = 0;
+	_self_pattern_protocol.bluePattern->theta               = 0;
+
+	switch(NODE_getId()) {
+	case 2:  // Front Left
+	    _self_pattern_protocol.redPattern->amplitude        = 125;
+	    _self_pattern_protocol.redPattern->bias             = 125;
+	    _self_pattern_protocol.greenPattern->amplitude      = 0;
+	    _self_pattern_protocol.greenPattern->bias           = 0;
+	    _self_pattern_protocol.bluePattern->amplitude       = 0;
+	    _self_pattern_protocol.bluePattern->bias            = 0;
+	    break;
+	case 3:  // Front Right
+	    _self_pattern_protocol.redPattern->amplitude        = 0;
+	    _self_pattern_protocol.redPattern->bias             = 0;
+	    _self_pattern_protocol.greenPattern->amplitude      = 125;
+	    _self_pattern_protocol.greenPattern->bias           = 125;
+	    _self_pattern_protocol.bluePattern->amplitude       = 0;
+	    _self_pattern_protocol.bluePattern->bias            = 0;
+	    break;
+	default:  //  Rear lights
+	    _self_pattern_protocol.redPattern->amplitude        = 125;
+	    _self_pattern_protocol.redPattern->bias             = 125;
+	    _self_pattern_protocol.greenPattern->amplitude      = 125;
+	    _self_pattern_protocol.greenPattern->bias           = 125;
+	    _self_pattern_protocol.bluePattern->amplitude       = 125;
+	    _self_pattern_protocol.bluePattern->bias            = 125;
+	}
+	_LPP_setPattern(PATTERN_FADEIN);
+	break;
+
+
         case PARAM_MACRO_FWUPDATE:
             _self_pattern_protocol.redPattern->cyclesRemaining      = CYCLES_INFINITE;
             _self_pattern_protocol.greenPattern->cyclesRemaining    = CYCLES_INFINITE;

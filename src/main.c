@@ -191,13 +191,11 @@ ISR(WDT_vect) {
 
             // node has not received i2c communications in NODE_MAX_TIMEOUT_SECONDS
             //   after startup - enter NODE_STARTUP_FAIL state
-            if (NODE_startup_timeout_seconds == NODE_MAX_TIMEOUT_SECONDS) {
+            if (NODE_startup_timeout_seconds >= NODE_MAX_TIMEOUT_SECONDS) {
 
-                // startup has failed, show all red LEDs
-                //   and stop processing further communication
-                LPP_setParamMacro(PARAM_MACRO_RED);
-                NODE_system_status = NODE_STARTUP_FAIL;
-
+                // startup has failed, show all Aviation colors 
+                //   and continue to check for communications
+                LPP_setParamMacro(PARAM_MACRO_AUTOMOBILE_COLORS);
             }
 
             // reset wdt flag
