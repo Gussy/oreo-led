@@ -222,16 +222,16 @@ void LPP_setParamMacro(LightParamMacro macro) {
 	switch(NODE_getId()) {
 	case 2:  // Front
 	case 3:
-	    _self_pattern_protocol.redPattern->amplitude        = 125;
-	    _self_pattern_protocol.redPattern->bias             = 125;
-	    _self_pattern_protocol.greenPattern->amplitude      = 125;
-	    _self_pattern_protocol.greenPattern->bias           = 125;
-	    _self_pattern_protocol.bluePattern->amplitude       = 125;
-	    _self_pattern_protocol.bluePattern->bias            = 125;
+	    _self_pattern_protocol.redPattern->amplitude        = 115;
+	    _self_pattern_protocol.redPattern->bias             = 120;
+	    _self_pattern_protocol.greenPattern->amplitude      = 95;
+	    _self_pattern_protocol.greenPattern->bias           = 100;
+	    _self_pattern_protocol.bluePattern->amplitude       = 27;
+	    _self_pattern_protocol.bluePattern->bias            = 30;
 	    break;
 	default:  // Rear
-	    _self_pattern_protocol.redPattern->amplitude        = 125;
-	    _self_pattern_protocol.redPattern->bias             = 125;
+	    _self_pattern_protocol.redPattern->amplitude        = 115;
+	    _self_pattern_protocol.redPattern->bias             = 120;
 	    _self_pattern_protocol.greenPattern->amplitude      = 0;
 	    _self_pattern_protocol.greenPattern->bias           = 0;
 	    _self_pattern_protocol.bluePattern->amplitude       = 0;
