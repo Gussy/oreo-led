@@ -199,22 +199,29 @@ void LPP_setParamMacro(LightParamMacro macro) {
 			switch(NODE_station) {
 				case 2:  // Front
 				case 3:
-					LPP_pattern_protocol.redPattern->amplitude        = 125;
+					LPP_pattern_protocol.redPattern->amplitude            = 115;
+					LPP_pattern_protocol.redPattern->bias                 = 120;
+					LPP_pattern_protocol.greenPattern->amplitude          = 95;
+					LPP_pattern_protocol.greenPattern->bias               = 100;
+					LPP_pattern_protocol.bluePattern->amplitude           = 27;
+					LPP_pattern_protocol.bluePattern->bias                = 30;
+
+					/*LPP_pattern_protocol.redPattern->amplitude        = 125;
 					LPP_pattern_protocol.redPattern->bias             = 125;
 					LPP_pattern_protocol.greenPattern->amplitude      = 125;
 					LPP_pattern_protocol.greenPattern->bias           = 125;
 					LPP_pattern_protocol.bluePattern->amplitude       = 125;
-					LPP_pattern_protocol.bluePattern->bias            = 125;
+					LPP_pattern_protocol.bluePattern->bias            = 125;*/
 					break;
 				default:  // Rear
-					LPP_pattern_protocol.redPattern->amplitude        = 125;
-					LPP_pattern_protocol.redPattern->bias             = 125;
+					LPP_pattern_protocol.redPattern->amplitude        = 115;
+					LPP_pattern_protocol.redPattern->bias             = 120;
 					LPP_pattern_protocol.greenPattern->amplitude      = 0;
 					LPP_pattern_protocol.greenPattern->bias           = 0;
 					LPP_pattern_protocol.bluePattern->amplitude       = 0;
 					LPP_pattern_protocol.bluePattern->bias            = 0;
 			}
-			_LPP_setPattern(PATTERN_FADEIN);
+			_LPP_setPattern(PATTERN_SOLID);
 			break;
 		
 
@@ -237,8 +244,8 @@ void LPP_setParamMacro(LightParamMacro macro) {
 
 			switch(NODE_station) {
 				case 2:  // Front Left
-				LPP_pattern_protocol.redPattern->amplitude        = 125;
-				LPP_pattern_protocol.redPattern->bias             = 125;
+				LPP_pattern_protocol.redPattern->amplitude        = 115;
+				LPP_pattern_protocol.redPattern->bias             = 120;
 				LPP_pattern_protocol.greenPattern->amplitude      = 0;
 				LPP_pattern_protocol.greenPattern->bias           = 0;
 				LPP_pattern_protocol.bluePattern->amplitude       = 0;
@@ -247,20 +254,20 @@ void LPP_setParamMacro(LightParamMacro macro) {
 				case 3:  // Front Right
 				LPP_pattern_protocol.redPattern->amplitude        = 0;
 				LPP_pattern_protocol.redPattern->bias             = 0;
-				LPP_pattern_protocol.greenPattern->amplitude      = 125;
-				LPP_pattern_protocol.greenPattern->bias           = 125;
+				LPP_pattern_protocol.greenPattern->amplitude      = 115;
+				LPP_pattern_protocol.greenPattern->bias           = 120;
 				LPP_pattern_protocol.bluePattern->amplitude       = 0;
 				LPP_pattern_protocol.bluePattern->bias            = 0;
 				break;
 				default:  //  Rear lights
-				LPP_pattern_protocol.redPattern->amplitude        = 125;
-				LPP_pattern_protocol.redPattern->bias             = 125;
-				LPP_pattern_protocol.greenPattern->amplitude      = 125;
-				LPP_pattern_protocol.greenPattern->bias           = 125;
-				LPP_pattern_protocol.bluePattern->amplitude       = 125;
-				LPP_pattern_protocol.bluePattern->bias            = 125;
+				LPP_pattern_protocol.redPattern->amplitude        = 115;
+				LPP_pattern_protocol.redPattern->bias             = 120;
+				LPP_pattern_protocol.greenPattern->amplitude      = 115;
+				LPP_pattern_protocol.greenPattern->bias           = 120;
+				LPP_pattern_protocol.bluePattern->amplitude       = 115;
+				LPP_pattern_protocol.bluePattern->bias            = 120;
 			}
-			_LPP_setPattern(PATTERN_FADEIN);
+			_LPP_setPattern(PATTERN_SOLID);
 		break;
 		
         case PARAM_MACRO_FWUPDATE:
