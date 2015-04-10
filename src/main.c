@@ -72,7 +72,7 @@ int main(void) {
     NODE_init();
 
     // init TWI node singleton with device ID
-    TWI_init(NODE_getId());
+    //TWI_init(NODE_getId());
 
     // register TWI event callbacks
     TWI_onGeneralCall(SYNCLK_recordPhaseError);
