@@ -97,8 +97,8 @@ int main(void)
 	#define TCCR1B_CLOCK_FULL	0b00000001
 	#define TCCR1B_CLOCK_DIV8	0b00000010
 	
-	#define PWM_DEFAULT_RED		(255*0.2)*1.0
-	#define PWM_DEFAULT_GREEN	(255*0.2)*0.6
+	#define PWM_DEFAULT_RED		(255*0.2)*0.0
+	#define PWM_DEFAULT_GREEN	(255*0.2)*1.0
 	
 	// Initialise the EEPROM colour values
 	uint8_t pwm_red = eeprom_read_byte((uint8_t*)EEPROM_BOOT_RED);
