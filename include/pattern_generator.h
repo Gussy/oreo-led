@@ -31,14 +31,15 @@ static const int CYCLES_STOP = -1;
 
 typedef enum _Pattern_Enum {
     PATTERN_OFF,                // 0
-    PATTERN_SINE,               // 1
+    PATTERN_BREATHE,            // 1
     PATTERN_SOLID,              // 2
     PATTERN_SIREN,              // 3
     PATTERN_STROBE,             // 4
     PATTERN_FADEIN,             // 5
     PATTERN_FADEOUT,            // 6
     PATTERN_PARAMUPDATE,        // 7
-    PATTERN_ENUM_COUNT          // 8
+	PATTERN_FWUPDATE,           // 8
+    PATTERN_ENUM_COUNT          // 9
 } PatternEnum;
 
 typedef struct _Pattern_Generator_State {
@@ -48,7 +49,7 @@ typedef struct _Pattern_Generator_State {
     double theta;
     uint8_t speed;
     double phase;
-    uint8_t amplitude;
+    double amplitude;
     uint8_t bias;
     uint8_t value;
     uint8_t isNewCycle;

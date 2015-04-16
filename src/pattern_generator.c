@@ -57,16 +57,28 @@ void PG_calc(PatternGenerator* self, double clock_position) {
     // update pattern value
     switch(self->pattern) {
 
-        case PATTERN_SINE: 
+		case PATTERN_FWUPDATE:
+			if (self->cyclesRemaining != CYCLES_STOP) {
+				// calculate the carrier signal
+				carrier = sin(self->theta);
+
+				// value is a sin function output of the form
+				// B + A * sin(theta)
+				self->value = self->bias + self->amplitude * carrier;
+			}
+			break;
+
+        case PATTERN_BREATHE: 
             if (self->cyclesRemaining != CYCLES_STOP) {
 	            // calculate the carrier signal
-	            carrier = sin(self->theta);
+	            carrier = fabs(cos(self->theta));
 
 	            // value is a sin function output of the form
-	            // B + A * sin(theta)
-	            self->value = self->bias + self->amplitude * carrier;
+	            // B * (A * abs(cos(theta)))
+				self->value = self->bias * (self->amplitude * carrier);
             }
             break;
+
         case PATTERN_STROBE: 
             if (self->cyclesRemaining != CYCLES_STOP) {
 	            // calculate the carrier signal
@@ -78,7 +90,9 @@ void PG_calc(PatternGenerator* self, double clock_position) {
 	            self->value = self->bias + self->amplitude * carrier;
             }
             break;
-        case PATTERN_SIREN: 
+
+        case PATTERN_SIREN:
+ 
 			if (self->cyclesRemaining != CYCLES_STOP) {
 				// calculate the carrier signal
 				carrier = sin(tan(self->theta)*.5);
@@ -87,9 +101,11 @@ void PG_calc(PatternGenerator* self, double clock_position) {
 				self->value = self->bias + self->amplitude * carrier;
 			}
             break;
+
         case PATTERN_SOLID: 
 			self->value = self->bias;
             break;
+
         case PATTERN_FADEOUT: 
 			if (self->cyclesRemaining > 0) return;
 			if (self->cyclesRemaining == 0) {
@@ -102,6 +118,7 @@ void PG_calc(PatternGenerator* self, double clock_position) {
 				self->value = 0;
 			} 
             break;
+
         case PATTERN_FADEIN: 
 			if (self->cyclesRemaining > 0) return;
 
@@ -115,6 +132,7 @@ void PG_calc(PatternGenerator* self, double clock_position) {
 				self->value = self->amplitude;
 			}
             break;
+
         case PATTERN_OFF:
         default: 
             self->value = 0;

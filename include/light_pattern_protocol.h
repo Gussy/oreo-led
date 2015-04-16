@@ -25,7 +25,18 @@
 #define MAX_PATTERN_PERIOD 4000.0
 
 // Nonce used to verify reset command is valid
-#define RESET_NONCE 0x2A
+#define RESET_NONCE		0x2A
+
+// Preset colour mixes
+#define COLOUR_MAX		0xFF
+
+#define COLOUR_WHITE_R	COLOUR_MAX*0.50
+#define COLOUR_WHITE_G	COLOUR_MAX*0.60
+#define COLOUR_WHITE_B	COLOUR_MAX*0.28
+
+#define COLOUR_AMBER_R	COLOUR_MAX*1.00
+#define COLOUR_AMBER_G	COLOUR_MAX*0.40
+#define COLOUR_AMBER_B	0
 
 typedef enum _Light_Protocol_Parameter {
     PARAM_BIAS_RED,             // 0
@@ -45,18 +56,15 @@ typedef enum _Light_Protocol_Parameter {
 typedef enum _Light_Param_Macro {
     PARAM_MACRO_RESET,				// 0
     PARAM_MACRO_FWUPDATE,			// 1
-	PARAM_MACRO_AUTOPILOT,			// 2
+	PARAM_MACRO_BREATHE,			// 2
 	PARAM_MACRO_CALIBRATE,			// 3
 	PARAM_MACRO_POWERON,			// 4
 	PARAM_MACRO_POWEROFF,		    // 5
-	PARAM_MACRO_RED,				// 6
-	PARAM_MACRO_GREEN,				// 7
-	PARAM_MACRO_BLUE,				// 8
-	PARAM_MACRO_AMBER,				// 9
-	PARAM_MACRO_WHITE,				// 10
-	PARAM_MACRO_AUTOMOBILE_COLORS,  // 11
-	PARAM_MACRO_AVIATION_COLORS,    // 12
-    PARAM_MACRO_ENUM_COUNT			// 13
+	PARAM_MACRO_AMBER,				// 6
+	PARAM_MACRO_WHITE,				// 7
+	PARAM_MACRO_AUTOMOBILE_COLORS,  // 8
+	PARAM_MACRO_AVIATION_COLORS,    // 9
+    PARAM_MACRO_ENUM_COUNT			// 10
 } LightParamMacro;
 
 static const short int LightParameterSize[PARAM_ENUM_COUNT] = {
