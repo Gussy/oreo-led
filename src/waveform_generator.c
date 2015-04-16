@@ -99,11 +99,9 @@ void WG_updatePWM(void) {
     //  scaled to the maximum physical duty cycle (presented to LEDs) mandated by hardware.
     //  Using fmod() here to enforce an input upper limit.
     //
-    int channel_1_pwm_value = (fmod(*(_self_waveform_gen.channel_target[0]), 256.0)/256.0) * PWM_MAX_VALUE;
-    int channel_2_pwm_value = (fmod(*(_self_waveform_gen.channel_target[1]), 256.0)/256.0) * PWM_MAX_VALUE;
-    // the third (non hardware PWM channel) should be offset by 10 (never a zero value)
-    // to implement the lower threshold for 'full off' 
-    int channel_3_pwm_value = (fmod(*(_self_waveform_gen.channel_target[2]), 256.0)/256.0) * (PWM_MAX_VALUE-10) + 10;
+    uint8_t channel_1_pwm_value = (fmod(*(_self_waveform_gen.channel_target[0]), 256.0)/256.0) * PWM_MAX_VALUE;
+    uint8_t channel_2_pwm_value = (fmod(*(_self_waveform_gen.channel_target[1]), 256.0)/256.0) * PWM_MAX_VALUE;
+    uint8_t channel_3_pwm_value = (fmod(*(_self_waveform_gen.channel_target[2]), 256.0)/256.0) * (PWM_MAX_VALUE-PWM_BLUE_MIN_VALUE) + PWM_BLUE_MIN_VALUE;
 
     // assign chan1& chan2 values directly to PWM timers
     *(_self_waveform_gen.channel_1_output) = channel_1_pwm_value;
@@ -114,8 +112,7 @@ void WG_updatePWM(void) {
     //  truly 0% duty cycle. Without this protection, the PWM gen
     //  will actually either (1) blip the output pin high before 
     //  reaching the OCRx value, or (2) miss the OCRx value completely
-    //  and produce a 100% duty cycle. Either condition is not desireable
-
+    //  and produce a 100% duty cycle. Either condition is not desirable
 
     // set pins to input mode, if value is actually zero
     if (channel_1_pwm_value == 0) DDRB &= 0b11111011;   //PB2 reset to input
@@ -124,17 +121,16 @@ void WG_updatePWM(void) {
     // set pins to input mode, if value is actually zero
     if (channel_2_pwm_value == 0) DDRB &= 0b11111101;   //PB1 reset to input
     else DDRB |= 0b00000010;                            //PB1 set to output
+	
+	// set pins to input mode, if value is less than PWM_MIN_VALUE
+	if (channel_3_pwm_value <= PWM_BLUE_MIN_VALUE) _self_waveform_gen.channel_3_enable = 0;
+	else _self_waveform_gen.channel_3_enable = 1;
 
     // The following is a similar implementation of the above thresholding logic
     //  but for the (non-hardware pwm) ch3 output
 
     // assign channel 3 value to a proxy
     _self_waveform_gen.channel_3_output = channel_3_pwm_value;
-    
-    // implement a lower threshold for channel3 to enable full off
-    _self_waveform_gen.channel_3_enable = (_self_waveform_gen.channel_3_output > 10) ? 1 : 0;
-
-
 }
 
 // execute a callback on timer1 overflow
