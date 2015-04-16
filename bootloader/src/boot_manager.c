@@ -21,6 +21,8 @@ extern uint8_t NODE_station;
 extern uint8_t TWI_masterXOR;
 extern uint8_t TWI_BufferXOR;
 
+static void BOOT_eepromWriteWord(uint16_t addr, uint16_t value);
+
 void BOOT_processBuffer(void)
 {	
     // if command is new, re-parse
@@ -184,16 +186,11 @@ void BOOT_write_flash_page(void)
 		flash_buf[1] = pgm_read_byte(INTVECT_PAGE_ADDRESS + 1);
 		
 		// Also erase the magic EEPROM key and app version
-		eeprom_update_word((uint16_t*)EEPROM_MAGIC_START, 0xFFFF);
-		eeprom_busy_wait();
-		eeprom_update_word((uint16_t*)EEPROM_APP_VER_START, 0xFFFF);
-		eeprom_busy_wait();
-		eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, 0xFFFF);
-		eeprom_busy_wait();
-		eeprom_update_word((uint16_t*)EEPROM_APP_LEN_START, 0xFFFF);
-		eeprom_busy_wait();
-		eeprom_update_word((uint16_t*)EEPROM_APP_JMP_ADDR, 0xFFFF);
-		eeprom_busy_wait();
+		BOOT_eepromWriteWord(EEPROM_MAGIC_START, 0xFFFF);
+		BOOT_eepromWriteWord(EEPROM_APP_VER_START, 0xFFFF);
+		BOOT_eepromWriteWord(EEPROM_APP_CRC_START, 0xFFFF);
+		BOOT_eepromWriteWord(EEPROM_APP_LEN_START, 0xFFFF);
+		BOOT_eepromWriteWord(EEPROM_APP_JMP_ADDR, 0xFFFF);
 	}
 	
 	// Erase the page and wait
@@ -216,17 +213,10 @@ void BOOT_write_flash_page(void)
 void BOOT_finalise_flash(void)
 {
 	// Also erase the magic EEPROM key since there's no going back now...
-	eeprom_update_word((uint16_t*)EEPROM_MAGIC_START, EEPROM_MAGIC_KEY);
-	eeprom_busy_wait();
-	
-	eeprom_update_word((uint16_t*)EEPROM_APP_VER_START, app_version);
-	eeprom_busy_wait();
-	
-	eeprom_update_word((uint16_t*)EEPROM_APP_LEN_START, app_length);
-	eeprom_busy_wait();
-	
-	eeprom_update_word((uint16_t*)EEPROM_APP_JMP_ADDR, app_jump_addr);
-	eeprom_busy_wait();
+	BOOT_eepromWriteWord(EEPROM_MAGIC_START, EEPROM_MAGIC_KEY);
+	BOOT_eepromWriteWord(EEPROM_APP_VER_START, app_version);
+	BOOT_eepromWriteWord(EEPROM_APP_LEN_START, app_length);
+	BOOT_eepromWriteWord(EEPROM_APP_JMP_ADDR, app_jump_addr);
 	
 	// Update the checksum of the application flash
 	BOOT_updateAppChecksum();
@@ -249,6 +239,11 @@ void BOOT_updateAppChecksum(void)
 	for(i = 2; i < app_len; i+=2) {
 		calced_checksum ^= (pgm_read_byte(i) << 8) | pgm_read_byte(i+1);
 	}
-	eeprom_update_word((uint16_t*)EEPROM_APP_CRC_START, calced_checksum);
+	BOOT_eepromWriteWord(EEPROM_APP_CRC_START, calced_checksum);
+}
+
+static void BOOT_eepromWriteWord(uint16_t addr, uint16_t data)
+{
+	eeprom_update_word((uint16_t*)addr, data);
 	eeprom_busy_wait();
 }
