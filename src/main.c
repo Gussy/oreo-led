@@ -40,6 +40,8 @@
 #include "waveform_generator.h"
 #include "node_manager.h"
 
+#define DEBUG_MACRO		PARAM_MACRO_FWUPDATE
+
 extern uint8_t NODE_station;
 
 // the watchdog timer remains active even after a system reset 
@@ -65,7 +67,9 @@ int main(void) {
     NODE_init();
 
     // init TWI node singleton with device ID
+#ifndef DEBUG_MACRO
     TWI_init(NODE_station);
+#endif
 
     // init the generators
     PG_init(&pgRed);
@@ -88,11 +92,13 @@ int main(void) {
     //  updates in a coordinated way
     WG_onOverflow(SYNCLK_updateClock);
 
+#ifndef DEBUG_MACRO
     // configure startup health check timer
     //   to enter 'failed' more (all red LEDs)
     //   if device has not received any i2c comms
     //   after NODE_MAX_TIMEOUT_SECONDS
     NODE_wdt_setOneSecInterruptMode();
+#endif
 
     // reset wdt timer
     NODE_wdt_reset();
@@ -101,6 +107,10 @@ int main(void) {
     sei();
 	
 	double clockPosition;
+
+#ifdef DEBUG_MACRO
+	LPP_setParamMacro(DEBUG_MACRO);
+#endif
 	
     // application mainloop 
     while(1) {
