@@ -13,11 +13,38 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/sleep.h>
 #include <avr/cpufunc.h>
+#include <avr/sfr_defs.h>
+#include <util/delay.h>
+#include <string.h>
 
 #include "twi_manager.h"
 #include "node_manager.h"
+#include "synchro_clock.h"
+#include "light_pattern_protocol.h"
+
+extern uint8_t NODE_station;
+
+static uint8_t TWI_SendPtr;
+static uint8_t TWI_ReplyLen;
+static uint8_t TWI_ReplyBuf[8];
+
+// TWI application status flags
+static uint8_t TWI_isBufferAvailable; 
+static uint8_t TWI_isSlaveAddressed;
+
+void debug_pulse(uint8_t count)
+{
+    uint8_t oldSREG = SREG;
+    cli();
+    while (count--) {
+        PORTB |= 0b00010000;         
+        _delay_us(1);
+        PORTB &= ~0b00010000;         
+        _delay_us(1);
+    }
+    SREG = oldSREG;
+}
 
 void TWI_init(uint8_t deviceId) {
 
@@ -26,7 +53,7 @@ void TWI_init(uint8_t deviceId) {
     //  if PB4 is ever asserted high, an error has
     //  been detected
     DDRB |= 0b00010000; 
-    PORTB &= 0b11101111; 
+    PORTB &= 0b11101111;
 
     // calculate slave address
     // 8-bit address is 0xD0, 0xD2, 
@@ -42,103 +69,62 @@ void TWI_init(uint8_t deviceId) {
 
 }
 
-// specify callback to be executed
-//  when device receives a general call
-void TWI_onGeneralCall(void (*cb)()) {
-
-    generalCallCB = cb;
-
-}
-
-// specify callback to be executed
-//  when device receives a completed 
-//  data packet (at STOP signal)
-void TWI_onDataReceived(void (*cb)()) {
-
-    dataReceivedCB = cb;
-
-}
-
-// returns pointer to TWI data buffer
-char* TWI_getBuffer(void) {
-
-    return TWI_Buffer;
-
-}
-
-// returns buffer pointer
-int TWI_getBufferSize(void) {
-
-    return TWI_Ptr;
-
-}
-
-// reset bit pattern for TWI control register
-const char TWCR_RESET = TWCR_TWINT | TWCR_TWIE | TWCR_TWEA | TWCR_TWEN;
-
 // TWI ISR
 ISR(TWI_vect) {
 
     switch(TWSR) {
 
         // Own SLA+R has been received; ACK has been returned
-        case TWI_STX_ADR_ACK:      
+        case TWI_STX_ADR_ACK:  
+		    TWI_SendPtr = 0;
+		
         // Arbitration lost in SLA+R/W as Master; own SLA+R has been received; 
         // ACK has been returned      
-        case TWI_STX_ADR_ACK_M_ARB_LOST: 
-        // Data byte in TWDR has been transmitted; ACK has been received
+        //case TWI_STX_ADR_ACK_M_ARB_LOST: 
+		
+		// Data byte in TWDR has been transmitted; NACK has been received.
+		// I.e. this could be the end of the transmission.
+		case TWI_STX_DATA_NACK:
+			// reset TWCR
+			TWCR = TWCR_RESET;
+			break;
+		
+		// Data byte in TWDR has been transmitted; ACK has been received
         case TWI_STX_DATA_ACK:           
             // set per atmel app note example for SLAR mode
-            TWCR = TWCR_RESET;
-            break;
-
-        // bus failure
-        case TWI_NO_STATE:
-        case TWI_BUS_ERROR:
-
-            // release clock line and send stop bit
-            //   in the event of a bus failure detected
-            TWCR = TWCR_TWINT | TWCR_TWSTO;
-
-            // re-init device
-            // slave address will be lost in this case
-            TWI_init(NODE_getId());
-
-            break; 
-
-        // general call detected
-        case TWI_SRX_GEN_ACK:
-
-            // execute callback when general call received
-            if (generalCallCB) generalCallCB();
-            TWI_isSlaveAddressed = 0;
-
-            // reset TWCR
-            TWCR = TWCR_RESET;
-
-            break; 
-
-        // Previously addressed with general call; 
-        // data has been received; ACK has been returned
-        case TWI_SRX_GEN_DATA_ACK: 
-
-            // reset TWCR
-            TWCR = TWCR_RESET;
+            if (TWI_SendPtr >= TWI_ReplyLen) {
+                TWDR = 0xFF;
+            } else {
+                TWDR = TWI_ReplyBuf[TWI_SendPtr++];
+            }
+            TWCR |= (1<<TWINT) | (1<<TWEA);
             break;
 
         // A STOP condition or repeated START condition has been 
         // received while still addressed as Slave    
         //   Record the end of a transmission if stop bit received
         case TWI_SRX_STOP_RESTART:
-
             // execute callback when data received
             // and addressed as slave (do not process gen call data)
-            if (TWI_isSlaveAddressed && dataReceivedCB) 
-                dataReceivedCB();
+            if (TWI_isSlaveAddressed) {
+				TWI_transmittedXOR = TWI_Buffer[--TWI_Ptr]; // Pop the transmitted XOR from the buffer
+				TWI_calculatedXOR ^= TWI_transmittedXOR; // Double XOR the last byte to remove it from the checksum
+
+				if(TWI_transmittedXOR == TWI_calculatedXOR) {
+					// Send a reply containing the node address and the calculated XOR
+					TWI_ReplyBuf[0] = (TWAR>>1);
+					TWI_ReplyBuf[1] = TWI_calculatedXOR;
+					TWI_ReplyLen = 2;
+				} else {
+					debug_pulse(2);
+					TWI_ReplyLen = 0;
+				}
+				
+				LPP_pattern_protocol.isCommandFresh = 1;
+			}
 
             // reset TWCR
             TWCR = TWCR_RESET;
-
             break;
 
         // Own SLA+W has been received ACK has been returned
@@ -149,28 +135,46 @@ ISR(TWI_vect) {
             TWI_Ptr = 0;
             TWI_isBufferAvailable = 1;
             TWI_isSlaveAddressed = 1;
+			TWI_calculatedXOR = (TWAR>>1);
 
             // reset TWCR
             TWCR = TWCR_RESET;
-
             break; 
 
         // if this unit was addressed and we're receiving
         //   data, continue capturing into buffer
-        case TWI_SRX_ADR_DATA_ACK: 
+        case TWI_SRX_ADR_DATA_ACK:
 
             // record received data 
             //   until buffer is full
             if (TWI_Ptr == TWI_MAX_BUFFER_SIZE) 
                 TWI_isBufferAvailable = 0;
 
-            if (TWI_isBufferAvailable)
+            if (TWI_isBufferAvailable) {
                 TWI_Buffer[TWI_Ptr++] = TWDR;
+				TWI_calculatedXOR ^= TWI_Buffer[TWI_Ptr-1];
+			}
 
             // reset TWCR
             TWCR = TWCR_RESET;
-
             break;
+
+        // general call detected
+        case TWI_SRX_GEN_ACK:
+			// execute callback when general call received
+			SYNCLK_recordPhaseError();
+			TWI_isSlaveAddressed = 0;
+
+			// reset TWCR
+			TWCR = TWCR_RESET;
+			break;
+
+        // Previously addressed with general call;
+        // data has been received; ACK has been returned
+        case TWI_SRX_GEN_DATA_ACK:
+			// reset TWCR
+			TWCR = TWCR_RESET;
+			break;
 
         // Previously addressed with own SLA+W; data has been received; 
         // NOT ACK has been returned
@@ -185,19 +189,30 @@ ISR(TWI_vect) {
             TWCR = TWCR_RESET;
             break;
 
+        // bus failure
+        case TWI_NO_STATE:
+        case TWI_BUS_ERROR:
+			// release clock line and send stop bit
+			//   in the event of a bus failure detected
+			TWCR = TWCR_TWINT | TWCR_TWSTO;
+
+			// re-init device
+			// slave address will be lost in this case
+			TWI_init(NODE_station);
+			break;
+
         // something horrible and upforeseen has happened
         default:
-
             // reset TWCR
             TWCR = TWCR_RESET;
 
             // default case 
             //  assert PB4 for debug
-            PORTB |= 0b00010000; 
-
+            //PORTB |= 0b00010000;
+			//debug_pulse(4);
+            
     }
 
     // always release clock line
     TWCR |= TWCR_TWINT;
-
 }

@@ -1,22 +1,11 @@
-/**********************************************************************
-
-  twi_manager.h - I2C/TWI wrapper methods to asynchronously handle 
-    transmission events. A maximum buffer size and slave address must
-    be specified in the header file.
-
-
-  Authors: 
-    Nate Fisher
-
-  Created: 
-    Wed Oct 1, 2014
-
-**********************************************************************/
-
 #ifndef  TWI_MANAGER_H
 #define  TWI_MANAGER_H
 
-#include "utilities.h"
+#define TWI_BASE_ADDRESS	0xD0
+#define TWI_SLW_BUFFER_SIZE 40
+#define TWI_SLR_BUFFER_SIZE 10
+
+#define ZERO				0x00
 
 // TWI hardware flags
 #define TWCR_TWINT          0b10000000 // TWI Interrupt Flag
@@ -38,18 +27,6 @@
 #define TWI_REP_START              0x10  // Repeated START has been transmitted
 #define TWI_ARB_LOST               0x38  // Arbitration lost
 
-// TWI Master Transmitter staus codes                      
-#define TWI_MTX_ADR_ACK            0x18  // SLA+W has been tramsmitted and ACK received
-#define TWI_MTX_ADR_NACK           0x20  // SLA+W has been tramsmitted and NACK received 
-#define TWI_MTX_DATA_ACK           0x28  // Data byte has been tramsmitted and ACK received
-#define TWI_MTX_DATA_NACK          0x30  // Data byte has been tramsmitted and NACK received 
-
-// TWI Master Receiver staus codes  
-#define TWI_MRX_ADR_ACK            0x40  // SLA+R has been tramsmitted and ACK received
-#define TWI_MRX_ADR_NACK           0x48  // SLA+R has been tramsmitted and NACK received
-#define TWI_MRX_DATA_ACK           0x50  // Data byte has been received and ACK tramsmitted
-#define TWI_MRX_DATA_NACK          0x58  // Data byte has been received and NACK tramsmitted
-
 // TWI Slave Transmitter staus codes
 #define TWI_STX_ADR_ACK            0xA8  // Own SLA+R has been received; ACK has been returned
 #define TWI_STX_ADR_ACK_M_ARB_LOST 0xB0  // Arbitration lost in SLA+R/W as Master; own SLA+R has been received; ACK has been returned
@@ -60,30 +37,29 @@
 // TWI Slave Receiver staus codes
 #define TWI_SRX_ADR_ACK            0x60  // Own SLA+W has been received ACK has been returned
 #define TWI_SRX_ADR_ACK_M_ARB_LOST 0x68  // Arbitration lost in SLA+R/W as Master; own SLA+W has been received; ACK has been returned
-#define TWI_SRX_GEN_ACK            0x70  // General call address has been received; ACK has been returned
-#define TWI_SRX_GEN_ACK_M_ARB_LOST 0x78  // Arbitration lost in SLA+R/W as Master; General call address has been received; ACK has been returned
 #define TWI_SRX_ADR_DATA_ACK       0x80  // Previously addressed with own SLA+W; data has been received; ACK has been returned
 #define TWI_SRX_ADR_DATA_NACK      0x88  // Previously addressed with own SLA+W; data has been received; NOT ACK has been returned
-#define TWI_SRX_GEN_DATA_ACK       0x90  // Previously addressed with general call; data has been received; ACK has been returned
-#define TWI_SRX_GEN_DATA_NACK      0x98  // Previously addressed with general call; data has been received; NOT ACK has been returned
 #define TWI_SRX_STOP_RESTART       0xA0  // A STOP condition or repeated START condition has been received while still addressed as Slave
 
 // TWI Miscellaneous status codes
 #define TWI_NO_STATE               0xF8  // No relevant state information available; TWINT = “0”
 #define TWI_BUS_ERROR              0x00  // Bus error due to an illegal START or STOP condition
 
-// Reset bit pattern for TWI control register
-#define TWCR_RESET	TWCR_TWINT | TWCR_TWIE | TWCR_TWEA | TWCR_TWEN
+uint8_t TWI_readIsBusy;
 
 // TWI buffer
-#define TWI_MAX_BUFFER_SIZE 100
 uint8_t TWI_Ptr;
-uint8_t TWI_Buffer[TWI_MAX_BUFFER_SIZE];
-uint8_t TWI_transmittedXOR;
-uint8_t TWI_calculatedXOR;
+uint8_t TWI_Buffer[TWI_SLW_BUFFER_SIZE];
+uint8_t TWI_BufferXOR;
+uint8_t TWI_masterXOR;
+
+void debug_pulse(uint8_t count);
 
 char* TWI_getBuffer(void);
 uint8_t TWI_getBufferSize(void);
-void TWI_init(uint8_t);
+void TWI_init(void);
+void TWI_SetReply(uint8_t *buf, uint8_t len);
+
+void TWI_Process(void);
 
 #endif

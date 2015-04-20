@@ -42,19 +42,6 @@ uint8_t _NODE_station;
 // Reset the watchdog timer.  When the watchdog timer is enabled,
 #define NODE_wdt_reset() __asm__ __volatile__ ("wdr")
 
-#define RESTORE_POINT_AVAILABLE_ADDR    (uint8_t *)0x01
-#define RESTORE_POINT_RED_VALUE         (uint8_t *)0x02
-#define RESTORE_POINT_GREEN_VALUE       (uint8_t *)0x03
-#define RESTORE_POINT_BLUE_VALUE        (uint8_t *)0x04
-
-// manage node restore on WDT system reset
-void NODE_restoreRGBState(PatternGenerator*, PatternGenerator*, PatternGenerator*);
-void NODE_saveRGBState(PatternGenerator*, PatternGenerator*, PatternGenerator*);
-void NODE_setRestoreStateUnavailable();
-uint8_t NODE_isRestoreStateAvailable();
-
-
-uint8_t NODE_getId();
 void NODE_init();
 void NODE_wdt_setOneSecInterruptMode();
 void NODE_wdt_setHalfSecResetMode();

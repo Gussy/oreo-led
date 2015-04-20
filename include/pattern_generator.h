@@ -31,29 +31,37 @@ static const int CYCLES_STOP = -1;
 
 typedef enum _Pattern_Enum {
     PATTERN_OFF,                // 0
-    PATTERN_SINE,               // 1
+    PATTERN_BREATHE,            // 1
     PATTERN_SOLID,              // 2
     PATTERN_SIREN,              // 3
     PATTERN_STROBE,             // 4
-    PATTERN_FADEIN,             // 5
-    PATTERN_FADEOUT,            // 6
-    PATTERN_PARAMUPDATE,        // 7
-    PATTERN_ENUM_COUNT          // 8
+	PATTERN_AVIATION_STROBE,	// 5
+    PATTERN_FADEIN,             // 6
+    PATTERN_FADEOUT,            // 7
+    PATTERN_PARAMUPDATE,        // 8
+	PATTERN_FWUPDATE,           // 9
+    PATTERN_ENUM_COUNT          // 10
 } PatternEnum;
 
 typedef struct _Pattern_Generator_State {
     
-    int cyclesRemaining; 
+    int8_t cyclesRemaining; 
     PatternEnum pattern;
     double theta;
-    double speed;
+    uint8_t speed;
     double phase;
     double amplitude;
-    double bias;
+    uint8_t bias;
     uint8_t value;
-    char isNewCycle;
+    uint8_t isNewCycle;
 
 } PatternGenerator;
+
+// create pattern generators for all
+//  three LED channels
+PatternGenerator pgRed;
+PatternGenerator pgGreen;
+PatternGenerator pgBlue;
 
 void PG_init(PatternGenerator*);
 void PG_calc(PatternGenerator*, double);
