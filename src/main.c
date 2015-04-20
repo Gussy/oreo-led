@@ -40,7 +40,7 @@
 #include "waveform_generator.h"
 #include "node_manager.h"
 
-#define DEBUG_MACRO		PARAM_MACRO_FWUPDATE
+//#define DEBUG_MACRO		PARAM_MACRO_AUTOMOBILE_COLORS
 
 extern uint8_t NODE_station;
 

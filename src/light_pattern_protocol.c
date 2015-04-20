@@ -228,6 +228,10 @@ void LPP_setParamMacro(LightParamMacro macro) {
 			LPP_pattern_protocol.redPattern->phase				= 0;
 			LPP_pattern_protocol.greenPattern->phase			= 0;
 			LPP_pattern_protocol.bluePattern->phase				= 0;
+			
+			LPP_pattern_protocol.redPattern->amplitude			= 1;
+			LPP_pattern_protocol.greenPattern->amplitude		= 1;
+			LPP_pattern_protocol.bluePattern->amplitude			= 1;
 
 			_LPP_setPattern(PATTERN_BREATHE);
 			break;
@@ -348,9 +352,6 @@ void LPP_setParamMacro(LightParamMacro macro) {
 			LPP_pattern_protocol.greenPattern->cyclesRemaining	= CYCLES_INFINITE;
 			LPP_pattern_protocol.bluePattern->cyclesRemaining	= CYCLES_INFINITE;
 
-			LPP_pattern_protocol.redPattern->bias				= 0;
-		
-		
 			switch(NODE_station) {
 				case 2:  // Front Left
 				LPP_pattern_protocol.redPattern->bias			= COLOUR_MAX;
