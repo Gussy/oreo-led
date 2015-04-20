@@ -11,29 +11,27 @@ OBJECTS+= ${OBJECT_DIR}/node_manager.o ${OBJECT_DIR}/boot_manager.o
 BOOTLOADER_START=0x1800
 
 # shell commands
-CP=cp 
+CP=cp
 MKDIR=mkdir -p
-RM=rm -f 
-MV=mv 
+RM=rm -f
+MV=mv
 
 # build commands
 #PROGRAMMER=dragon_isp
 #PROGRAMMER=jtag3isp -B 8.0
 PROGRAMMER=avrisp2
-PROG=avrdude -c ${PROGRAMMER} -p attiny88 
-AVROBJCOPY=avr-objcopy 
-AVRSIZE=avr-size 
-AVRGCC=avr-gcc 
+PROG=avrdude -c ${PROGRAMMER} -p attiny88
+AVROBJCOPY=avr-objcopy
+AVRSIZE=avr-size
+AVRGCC=avr-gcc
 CFLAGS=-Wall -Wpadded -fdata-sections -ffunction-sections -Os -DF_CPU=8000000 -mmcu=${DEVICE} -Iinclude -DBOOTLOADER_START=${BOOTLOADER_START}
 LDFLAGS=-Wl,--section-start=.text=${BOOTLOADER_START}
-#LDFLAGS+=-Wl,--section-start=.data=0x8000C0
-#LDFLAGS+=-Wl,--section-start=.bootreset=0x00
 
 ##############################################
 # High level directives
 ##############################################
 
-all: 
+all:
 	${MKDIR} ${OBJECT_DIR}
 	make ${OBJECT_DIR}/${OUTPUT_NAME}.hex
 
@@ -45,7 +43,7 @@ clean:
 
 # sets high speed (full rate) clock: 8MHz
 fuse:
-	${PROG} -U lfuse:w:0xEE:m hfuse:w:0xDF:m efuse:w:0xFE:m
+	${PROG} -u -U lfuse:w:0xEE:m -U hfuse:w:0xDD:m -U efuse:w:0xfe:m
 
 ##############################################
 # Compile
@@ -67,7 +65,7 @@ ${OBJECT_DIR}/main.o: ${SRC_DIR}/main.c ${OBJECTS} ${OBJECT_DIR}/node_manager.o
 # Link
 ##############################################
 
-${OBJECT_DIR}/${OUTPUT_NAME}.elf: ${OBJECT_DIR}/main.o ${OBJECTS} 
+${OBJECT_DIR}/${OUTPUT_NAME}.elf: ${OBJECT_DIR}/main.o ${OBJECTS}
 	${AVRGCC} ${OBJECT_DIR}/main.o ${OBJECTS} ${CFLAGS} ${LDFLAGS} -o ${OBJECT_DIR}/${OUTPUT_NAME}.elf
 
 ${OBJECT_DIR}/${OUTPUT_NAME}.hex: ${OBJECT_DIR}/${OUTPUT_NAME}.elf
