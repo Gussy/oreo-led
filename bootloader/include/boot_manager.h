@@ -38,6 +38,9 @@
  * App CRC (BOOT_CMD_APP_CRC)
  *  SLA+W, 0x43, CRC, STO, SLA+R, ADDR, CMD, CRC[MSB], CRC[LSB], CRC, STO
  *
+ * Set Colour (BOOT_CMD_SET_COLOUR)
+ *  SLA+W, 0x44, <RED>, <GREEN>, CRC, STO, SLA+R, ADDR, CMD, CRC, STO
+ *
  * Write flash [Part A] (BOOT_CMD_WRITE_FLASH_A)
  *	SLA+W, 0x50, PAGE, {0..31}, CRC, STO, SLA+R, ADDR, CMD, CRC, STO
  *
