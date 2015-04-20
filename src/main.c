@@ -167,6 +167,9 @@ ISR(WDT_vect) {
                 LPP_setParamMacro(PARAM_MACRO_RESET);
                 //NODE_system_status = NODE_STARTUP_FAIL;
 
+                // startup has failed, show all Aviation colors 
+                //   and continue to check for communications
+                LPP_setParamMacro(PARAM_MACRO_AUTOMOBILE_COLORS);
             }
 
             // reset wdt flag
