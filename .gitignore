@@ -5,6 +5,7 @@ build/
 *.eep
 *.hex
 *.o
+*.elf
 .project
 .cproject
 *.atsuo
