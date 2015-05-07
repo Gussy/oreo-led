@@ -38,6 +38,9 @@
 #define COLOUR_AMBER_G	COLOUR_MAX*0.40
 #define COLOUR_AMBER_B	0
 
+#define EEPROM_LENGTH			64 // Zero based since it's used for read/write
+#define EEPROM_APP_CRC_START	(EEPROM_LENGTH - 6)
+
 typedef enum _Light_Protocol_Parameter {
     PARAM_BIAS_RED,             // 0
     PARAM_BIAS_GREEN,           // 1
@@ -50,7 +53,8 @@ typedef enum _Light_Protocol_Parameter {
     PARAM_PHASEOFFSET,          // 8
     PARAM_MACRO,                // 9
     PARAM_RESET,                // 10
-    PARAM_ENUM_COUNT            // 11
+	PARAM_APP_CHECKSUM,         // 11
+    PARAM_ENUM_COUNT            // 12
 } LightProtocolParameter;
 
 typedef enum _Light_Param_Macro {

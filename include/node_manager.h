@@ -27,7 +27,7 @@ uint8_t NODE_system_status;
 
 // startup timeout value to initiate failure mode
 //  in the event no i2c communications received
-#define NODE_MAX_TIMEOUT_SECONDS 2
+#define NODE_MAX_TIMEOUT_SECONDS 10
 uint8_t NODE_startup_timeout_seconds;
 
 // id of first node considered in 'front' of

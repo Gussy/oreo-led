@@ -13,6 +13,7 @@
 
 #include <avr/io.h>
 #include <avr/wdt.h>
+#include <avr/eeprom.h>
 #include "light_pattern_protocol.h"
 #include "pattern_generator.h"
 #include "utilities.h"
@@ -24,6 +25,8 @@ extern uint8_t TWI_Ptr;
 extern uint8_t TWI_Buffer[];
 extern uint8_t TWI_transmittedXOR;
 extern uint8_t TWI_calculatedXOR;
+extern uint8_t TWI_ReplyBuf[];
+extern uint8_t TWI_ReplyLen;
 
 uint8_t LPP_processBuffer(void) {
     // return true if command was processed
@@ -171,6 +174,15 @@ void _LPP_processParameterUpdate(LightProtocolParameter param, int start) {
                 wdt_enable(WDTO_15MS);
                 for(;;) {};
             break;
+		
+		case PARAM_APP_CHECKSUM:
+			TWI_ReplyBuf[0] = (TWAR>>1);
+			TWI_ReplyBuf[1] = PARAM_APP_CHECKSUM;
+			TWI_ReplyBuf[2] = eeprom_read_byte((uint8_t*)EEPROM_APP_CRC_START + 1);
+			TWI_ReplyBuf[3] = eeprom_read_byte((uint8_t*)EEPROM_APP_CRC_START);
+			TWI_ReplyBuf[4] = TWI_calculatedXOR;
+			TWI_ReplyLen = 5;
+			break;
 
         default:
             break;

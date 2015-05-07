@@ -26,8 +26,6 @@
 extern uint8_t NODE_station;
 
 static uint8_t TWI_SendPtr;
-static uint8_t TWI_ReplyLen;
-static uint8_t TWI_ReplyBuf[8];
 
 // TWI application status flags
 static uint8_t TWI_isBufferAvailable; 

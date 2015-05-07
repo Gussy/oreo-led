@@ -81,6 +81,8 @@ uint8_t TWI_Ptr;
 uint8_t TWI_Buffer[TWI_MAX_BUFFER_SIZE];
 uint8_t TWI_transmittedXOR;
 uint8_t TWI_calculatedXOR;
+uint8_t TWI_ReplyLen;
+uint8_t TWI_ReplyBuf[8];
 
 char* TWI_getBuffer(void);
 uint8_t TWI_getBufferSize(void);
