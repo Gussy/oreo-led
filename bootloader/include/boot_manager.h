@@ -22,7 +22,7 @@
 #define EEPROM_BOOT_GREEN		(EEPROM_LENGTH - 12)
 #define EEPROM_MAGIC_KEY		0xAA55
 
-#define BOOTLOADER_VERSION		0x01
+#define BOOTLOADER_VERSION		0x02
 
 /* TWI Command formats
  *

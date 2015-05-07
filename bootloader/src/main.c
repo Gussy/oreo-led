@@ -69,17 +69,15 @@ int main(void)
 		boot_spm_busy_wait ();
 	}
 
-#if 0
-    // delay to acquire hardware pin settings
+    // delay for 100ms to acquire hardware pin settings
     // and node initialization
     uint8_t i;
-    for (i=0; i<10; i++) {
+    for (i = 0; i < 10; i++) {
         PORTB |= 0b00010000; 
-        _delay_ms(2);
+        _delay_ms(5);
         PORTB &= ~0b00010000; 
-        _delay_ms(2);
+        _delay_ms(5);
     }
-#endif
 	
 	// Initialise the mode pins
 	NODE_init();
