@@ -1,4 +1,8 @@
 
+# versioning
+VERSION_MAJOR=1
+VERSION_MINOR=2
+
 # project config
 OBJECT_DIR=build
 SRC_DIR=src
@@ -14,6 +18,8 @@ CP=cp
 MKDIR=mkdir -p
 RM=rm -f 
 MV=mv 
+PRINTF=printf
+CAT=cat
 
 # build commands
 #PROGRAMMER=dragon_isp
@@ -79,5 +85,11 @@ ${OBJECT_DIR}/${OUTPUT_NAME}.hex: ${OBJECT_DIR}/${OUTPUT_NAME}.elf
 	${RM} -f ${OBJECT_DIR}/${OUTPUT_NAME}.hex
 	${RM} -f ${OBJECT_DIR}/${OUTPUT_NAME}.bin
 	${AVROBJCOPY} -j .text -j .data -O ihex ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/${OUTPUT_NAME}.hex
-	${AVROBJCOPY} -j .text -j .data -O binary ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/${OUTPUT_NAME}.bin
 	${AVRSIZE} --format=avr --mcu=${DEVICE} ${OBJECT_DIR}/${OUTPUT_NAME}.elf
+	
+	# Generate binary output for bootloading over I2C
+	# Prepend the two version bytes to the start of the binary file
+	#  these must be removed by from the binary by the master system before transmission
+	${AVROBJCOPY} -j .text -j .data -O binary ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/${OUTPUT_NAME}.tmp.bin
+	${PRINTF} '\x${VERSION_MAJOR}\x${VERSION_MINOR}' | ${CAT} - ${OBJECT_DIR}/${OUTPUT_NAME}.tmp.bin > ${OBJECT_DIR}/${OUTPUT_NAME}.bin
+	${RM} ${OBJECT_DIR}/${OUTPUT_NAME}.tmp.bin
