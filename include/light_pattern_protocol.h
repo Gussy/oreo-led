@@ -30,7 +30,7 @@
 // Preset colour mixes
 #define COLOUR_MAX		0xFF
 
-#define COLOUR_WHITE_R	COLOUR_MAX*0.50
+#define COLOUR_WHITE_R	COLOUR_MAX*0.70
 #define COLOUR_WHITE_G	COLOUR_MAX*0.60
 #define COLOUR_WHITE_B	COLOUR_MAX*0.28
 
