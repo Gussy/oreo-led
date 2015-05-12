@@ -68,22 +68,6 @@ int main(void)
 		boot_page_write((uint32_t)0x0000);
 		boot_spm_busy_wait ();
 	}
-
-    // delay for 100ms to acquire hardware pin settings
-    // and node initialization
-    uint8_t i;
-    for (i = 0; i < 10; i++) {
-        PORTB |= 0b00010000; 
-        _delay_ms(5);
-        PORTB &= ~0b00010000; 
-        _delay_ms(5);
-    }
-	
-	// Initialise the mode pins
-	NODE_init();
-
-    // init TWI node singleton with device ID
-    TWI_init();
 	
 	// Store the current application checksum in the EEPROM for querying later
 	BOOT_updateAppChecksum();
@@ -124,6 +108,22 @@ int main(void)
 	
 	OCR1AL = pwm_green;
 	OCR1BL = pwm_red;
+
+	// delay for 100ms to acquire hardware pin settings
+	// and node initialization
+	uint8_t i;
+	for (i = 0; i < 10; i++) {
+		PORTB |= 0b00010000;
+		_delay_ms(5);
+		PORTB &= ~0b00010000;
+		_delay_ms(5);
+	}
+
+	// Initialise the mode pins
+	NODE_init();
+
+	// init TWI node singleton with device ID
+	TWI_init();
 	
     while(1) {
 		// Process the TWI peripheral
