@@ -28,6 +28,4 @@ static inline uint16_t UTIL_charToInt(char msb, char lsb) {
     return ( ( (0x00FF & (uint16_t)msb) << 8) | (0x00FF & (uint16_t)lsb) );
 }
 
-void debug_pulse(uint8_t count);
-
 #endif

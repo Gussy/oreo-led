@@ -31,19 +31,6 @@ static uint8_t TWI_SendPtr;
 static uint8_t TWI_isBufferAvailable; 
 static uint8_t TWI_isSlaveAddressed;
 
-void debug_pulse(uint8_t count)
-{
-    uint8_t oldSREG = SREG;
-    cli();
-    while (count--) {
-        PORTB |= 0b00010000;         
-        _delay_us(1);
-        PORTB &= ~0b00010000;         
-        _delay_us(1);
-    }
-    SREG = oldSREG;
-}
-
 void TWI_init(uint8_t deviceId) {
 
     // configure debug pin (PB4) for twi bus
@@ -114,7 +101,6 @@ ISR(TWI_vect) {
 					TWI_ReplyBuf[1] = TWI_calculatedXOR;
 					TWI_ReplyLen = 2;
 				} else {
-					debug_pulse(2);
 					TWI_ReplyLen = 0;
 				}
 				
@@ -199,16 +185,10 @@ ISR(TWI_vect) {
 			TWI_init(NODE_station);
 			break;
 
-        // something horrible and upforeseen has happened
+        // something horrible and unforeseen has happened
         default:
             // reset TWCR
             TWCR = TWCR_RESET;
-
-            // default case 
-            //  assert PB4 for debug
-            //PORTB |= 0b00010000;
-			//debug_pulse(4);
-            
     }
 
     // always release clock line
