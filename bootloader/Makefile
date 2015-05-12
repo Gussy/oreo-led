@@ -74,5 +74,4 @@ ${OBJECT_DIR}/${OUTPUT_NAME}.hex: ${OBJECT_DIR}/${OUTPUT_NAME}.elf
 	${RM} -f ${OBJECT_DIR}/../${OUTPUT_NAME}.elf
 	${CP} ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/../${OUTPUT_NAME}.elf
 	${AVROBJCOPY} -j .text -j .data -j .bootreset -O ihex ${OBJECT_DIR}/${OUTPUT_NAME}.elf ${OBJECT_DIR}/${OUTPUT_NAME}.hex
-	${AVROBJCOPY} -I ihex -O binary ${OBJECT_DIR}/${OUTPUT_NAME}.hex ${OBJECT_DIR}/${OUTPUT_NAME}.bin
 	${AVRSIZE} --format=avr --mcu=${DEVICE} ${OBJECT_DIR}/${OUTPUT_NAME}.elf
