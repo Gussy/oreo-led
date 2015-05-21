@@ -15,7 +15,6 @@ static uint8_t reply[TWI_SLR_BUFFER_SIZE];
 
 static uint16_t app_version;
 static uint16_t app_length;
-static uint16_t app_checksum;
 
 extern uint8_t NODE_station;
 extern uint8_t TWI_masterXOR;
@@ -125,11 +124,10 @@ void BOOT_processBuffer(void)
 				reply[2] = TWI_BufferXOR;
 				TWI_SetReply(reply, 3);
 				
-				// Hold the version and checksum for writing later
+				// Hold the version and length for writing later
 				app_version = (TWI_Buffer[1] << 8) | TWI_Buffer[2];
 				app_length = (TWI_Buffer[3] << 8) | TWI_Buffer[4];
-				app_checksum = (TWI_Buffer[5] << 8) | TWI_Buffer[6];
-			
+				
 				// Schedule a write flash operation
 				BOOT_waitingToFinalise = 1;
 				break;
