@@ -145,6 +145,9 @@ void PG_calc(PatternGenerator* self, double clock_position) {
 			}
             break;
 
+		case PATTERN_PING:
+			break;
+
         case PATTERN_OFF:
         default:
             self->value = 0;

@@ -99,6 +99,12 @@ ISR(TWI_vect) {
 					// Send a reply containing the node address and the calculated XOR
 					TWI_ReplyBuf[0] = (TWAR>>1);
 					TWI_ReplyBuf[1] = TWI_calculatedXOR;
+					
+					// Modify the response buffer if the received pattern was a ping
+					// This lets the master differentiate between a bootloader/application ping response
+					if(TWI_Buffer[0] == PATTERN_PING)
+						TWI_ReplyBuf[1]++;
+					
 					TWI_ReplyLen = 2;
 				} else {
 					TWI_ReplyLen = 0;

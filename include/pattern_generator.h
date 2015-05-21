@@ -40,7 +40,8 @@ typedef enum _Pattern_Enum {
     PATTERN_FADEOUT,            // 7
     PATTERN_PARAMUPDATE,        // 8
 	PATTERN_FWUPDATE,           // 9
-    PATTERN_ENUM_COUNT          // 10
+    PATTERN_ENUM_COUNT,         // 10
+	PATTERN_PING = 0xAA			// Special byte sent by the oreoled master startup sequence
 } PatternEnum;
 
 typedef struct _Pattern_Generator_State {
