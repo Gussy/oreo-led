@@ -1,7 +1,7 @@
 
 # versioning
 VERSION_MAJOR=1
-VERSION_MINOR=3
+VERSION_MINOR=4
 
 # project config
 OBJECT_DIR=build
