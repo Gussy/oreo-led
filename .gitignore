@@ -9,3 +9,4 @@ build/
 .project
 .cproject
 *.atsuo
+*.componentinfo.xml
