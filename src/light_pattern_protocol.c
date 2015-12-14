@@ -52,7 +52,7 @@ uint8_t LPP_processBuffer(void) {
         while (buffer_pointer < TWI_Ptr) {
 
             // digest parameters serially
-            PatternEnum currParam;
+            LightProtocolParameter currParam;
 
             // ensure parameter is valid, stop parsing if invalid
             //    this means that part of a message can be parsed, until
@@ -247,73 +247,7 @@ void LPP_setParamMacro(LightParamMacro macro) {
 
 			_LPP_setPattern(PATTERN_BREATHE);
 			break;
-			
-		case PARAM_MACRO_CALIBRATE:
-			LPP_pattern_protocol.redPattern->cyclesRemaining	= CYCLES_INFINITE;
-			LPP_pattern_protocol.greenPattern->cyclesRemaining	= CYCLES_INFINITE;
-			LPP_pattern_protocol.bluePattern->cyclesRemaining	= CYCLES_INFINITE;
 
-			LPP_pattern_protocol.redPattern->speed				= 12;
-			LPP_pattern_protocol.greenPattern->speed			= 12;
-			LPP_pattern_protocol.bluePattern->speed				= 12;
-
-			LPP_pattern_protocol.redPattern->phase				= 0;
-			LPP_pattern_protocol.greenPattern->phase			= 0;
-			LPP_pattern_protocol.bluePattern->phase				= 0;
-
-			LPP_pattern_protocol.redPattern->bias				= 0;
-			LPP_pattern_protocol.greenPattern->bias				= 0;
-			LPP_pattern_protocol.bluePattern->bias				= 0;
-
-			_LPP_setPattern(PATTERN_STROBE);
-			break;
-
-		/*case PARAM_MACRO_POWERON:
-			LPP_pattern_protocol.redPattern->cyclesRemaining	= 1;
-			LPP_pattern_protocol.greenPattern->cyclesRemaining	= 1;
-			LPP_pattern_protocol.bluePattern->cyclesRemaining	= 1;
-
-			LPP_pattern_protocol.redPattern->speed				= 2;
-			LPP_pattern_protocol.greenPattern->speed			= 2;
-			LPP_pattern_protocol.bluePattern->speed				= 2;
-
-			LPP_pattern_protocol.redPattern->phase				= 0;
-			LPP_pattern_protocol.greenPattern->phase			= 0;
-			LPP_pattern_protocol.bluePattern->phase				= 0;
-
-			LPP_pattern_protocol.redPattern->amplitude			= 0;
-			LPP_pattern_protocol.redPattern->bias				= 0;
-			LPP_pattern_protocol.greenPattern->amplitude		= 115;
-			LPP_pattern_protocol.greenPattern->bias				= 120;
-			LPP_pattern_protocol.bluePattern->amplitude			= 0;
-			LPP_pattern_protocol.bluePattern->bias				= 0;
-
-			_LPP_setPattern(PATTERN_FADEIN);
-			break;
-		
-		case PARAM_MACRO_POWEROFF:
-			LPP_pattern_protocol.redPattern->cyclesRemaining	= 1;
-			LPP_pattern_protocol.greenPattern->cyclesRemaining	= 1;
-			LPP_pattern_protocol.bluePattern->cyclesRemaining	= 1;
-
-			LPP_pattern_protocol.redPattern->speed				= 2;
-			LPP_pattern_protocol.greenPattern->speed			= 2;
-			LPP_pattern_protocol.bluePattern->speed				= 2;
-
-			LPP_pattern_protocol.redPattern->phase				= 0;
-			LPP_pattern_protocol.greenPattern->phase			= 0;
-			LPP_pattern_protocol.bluePattern->phase				= 0;
-
-			LPP_pattern_protocol.redPattern->amplitude			= LPP_pattern_protocol.redPattern->value;
-			LPP_pattern_protocol.redPattern->bias				= 0;
-			LPP_pattern_protocol.greenPattern->amplitude		= LPP_pattern_protocol.greenPattern->value;
-			LPP_pattern_protocol.greenPattern->bias				= 0;
-			LPP_pattern_protocol.bluePattern->amplitude			= LPP_pattern_protocol.bluePattern->value;
-			LPP_pattern_protocol.bluePattern->bias				= 0;
-
-			_LPP_setPattern(PATTERN_FADEOUT);
-			break;*/
-		
 		case PARAM_MACRO_AMBER:
 			LPP_pattern_protocol.redPattern->cyclesRemaining	= CYCLES_INFINITE;
 			LPP_pattern_protocol.greenPattern->cyclesRemaining	= CYCLES_INFINITE;
@@ -381,6 +315,28 @@ void LPP_setParamMacro(LightParamMacro macro) {
 				LPP_pattern_protocol.bluePattern->bias			= COLOUR_WHITE_B;
 			}
 			_LPP_setPattern(PATTERN_SOLID);
+			break;
+		
+		case PARAM_MACRO_FADE_OUT:
+			LPP_pattern_protocol.redPattern->cyclesRemaining	= 1;
+			LPP_pattern_protocol.greenPattern->cyclesRemaining	= 1;
+			LPP_pattern_protocol.bluePattern->cyclesRemaining	= 1;
+
+			LPP_pattern_protocol.redPattern->speed				= 2;
+			LPP_pattern_protocol.greenPattern->speed			= 2;
+			LPP_pattern_protocol.bluePattern->speed				= 2;
+
+			LPP_pattern_protocol.redPattern->phase				= 0;
+			LPP_pattern_protocol.greenPattern->phase			= 0;
+			LPP_pattern_protocol.bluePattern->phase				= 0;
+
+			LPP_pattern_protocol.redPattern->amplitude			= LPP_pattern_protocol.redPattern->value;
+			LPP_pattern_protocol.redPattern->bias				= 0;
+			LPP_pattern_protocol.greenPattern->amplitude		= LPP_pattern_protocol.greenPattern->value;
+			LPP_pattern_protocol.greenPattern->bias				= 0;
+			LPP_pattern_protocol.bluePattern->amplitude			= LPP_pattern_protocol.bluePattern->value;
+			LPP_pattern_protocol.bluePattern->bias				= 0;
+			_LPP_setPattern(PATTERN_FADEOUT);
 			break;
 
         default:

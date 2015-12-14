@@ -11,8 +11,9 @@ OBJECTS+= ${OBJECT_DIR}/node_manager.o ${OBJECT_DIR}/boot_manager.o
 BOOTLOADER_START=0x1800
 
 # shell commands
+SHELL_UTILS_DIR=${AVRSTUDIO_EXE_PATH}/shellutils
 CP=cp
-MKDIR=mkdir -p
+MKDIR=${SHELL_UTILS_DIR}/mkdir -p
 RM=rm -f
 MV=mv
 
