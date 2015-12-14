@@ -83,7 +83,7 @@ void PG_calc(PatternGenerator* self, double clock_position) {
             if (self->cyclesRemaining != CYCLES_STOP) {
 	            // calculate the carrier signal
 	            // as square wave
-	            double carrier = (sin(self->theta) > 0) ? 1 : 0;
+	            float carrier = (sin(self->theta) > 0) ? 1 : 0;
 
 	            // value is a square wave with an
 	            // adjustable amplitude and bias
@@ -97,7 +97,7 @@ void PG_calc(PatternGenerator* self, double clock_position) {
 				// calculate the carrier signal
 				// as two square waves per cycle
 				// a pattern speed of 5 is close to realistic
-				double carrier = (sin(self->theta) > 0.6 && sin(self->theta) < 0.8) ? 1 : 0;
+				float carrier = (sin(self->theta) > 0.6 && sin(self->theta) < 0.8) ? 1 : 0;
 
 				// value is a square wave with an adjustable bias
 				self->value = self->bias * carrier;
@@ -107,7 +107,7 @@ void PG_calc(PatternGenerator* self, double clock_position) {
         case PATTERN_SIREN:
 			if (self->cyclesRemaining != CYCLES_STOP) {
 				// calculate the carrier signal
-				double carrier = sin(tan(self->theta)*.5);
+				float carrier = sin(tan(self->theta)*.5);
 
 				// value is an annoying strobe-like pattern
 				// B * (A * abs(cos(theta)))
